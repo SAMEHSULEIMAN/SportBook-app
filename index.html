@@ -1,214 +1,158 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
-  <title>سبورت بوك التيميت | حجز ملاعب ومدربين</title>
-  
-  <!-- الخطوط والأيقونات -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+  <title>سبورت بوك التيميت | SportBook Ultimate</title>
+  <!-- Font Awesome & Leaflet CSS -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  
-  <!-- مكتبات خارجية -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- مكتبات إضافية للرسوم البيانية والتصدير -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  
-  <!-- الأنماط المخصصة -->
+  <!-- ملف الأنماط المخصص -->
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <!-- شريط التنقل العلوي -->
   <header>
     <div class="app-container header-content">
-      <div class="logo">
-        <i class="fas fa-futbol"></i>
-        <h1>سبورت بوك التيميت</h1>
-      </div>
-      <div class="header-actions">
-        <button class="btn-icon" id="toggleLangBtn" title="تغيير اللغة">
-          <i class="fas fa-language"></i>
-          <span>English</span>
-        </button>
-        <div class="user-area" id="userArea"></div>
-      </div>
-      <nav id="mainNav" class="main-nav"></nav>
+    <div class="logo">
+      <h1><i class="fas fa-futbol"></i> سبورت بوك التيميت</h1>
     </div>
-  </header>
 
-  <!-- المحتوى الرئيسي -->
+    <div style="display: flex; align-items: center; gap: 16px;">
+      <button class="btn-sm" id="toggleLangBtn">
+        <i class="fas fa-language"></i>
+        <span id="langText">English</span>
+      </button>
+      <div class="user-area" id="userArea"></div>
+    </div>
+
+    <nav id="mainNav"></nav>
+  </div>
+</header>
+
   <main class="app-container">
-    <!-- الصفحة الرئيسية (خريطة + بطاقات) -->
+    <!-- الصفحة الرئيسية -->
     <section id="home" class="section active">
-      <div class="home-layout">
-        <!-- شريط البحث والفلترة -->
-        <div class="search-bar">
-          <div class="view-toggle">
-            <button id="showCourtsBtn" class="toggle-btn active">
-              <i class="fas fa-futbol"></i>
-              <span data-i18n="courts">الملاعب</span>
-            </button>
-            <button id="showCoachesBtn" class="toggle-btn">
-              <i class="fas fa-user-graduate"></i>
-              <span data-i18n="coaches">المدربين</span>
-            </button>
-          </div>
-          <div class="filter-group">
-            <select id="sportFilter" class="filter-select"></select>
-            <div class="add-sport-wrapper">
-              <input type="text" id="newSportInput" placeholder="أضف رياضة جديدة" data-i18n-placeholder="newSport">
-              <button id="addSportBtn" class="btn-icon" title="إضافة"><i class="fas fa-plus"></i></button>
-            </div>
-            <button id="filterBtn" class="btn btn-primary"><i class="fas fa-search"></i> <span data-i18n="filter">بحث</span></button>
-          </div>
+      <div class="card">
+        <h2><i class="fas fa-map-marked-alt"></i> استكشف الملاعب والمدربين</h2>
+        <button id="getCustomerLocationBtn" class="btn-outline" style="width:auto; margin-bottom:16px;"><i class="fas fa-location-dot"></i> حدد موقعي وانتقل إليه</button>
+        
+        <!-- أزرار التبديل بين عرض الملاعب والمدربين -->
+        <div style="display: flex; gap: 8px; margin-bottom: 16px;">
+          <button id="showCourtsBtn" class="btn-outline active toggle-view-btn">🏟️ الملاعب</button>
+          <button id="showCoachesBtn" class="btn-outline toggle-view-btn">👤 المدربين</button>
         </div>
-        
-        <!-- الخريطة -->
-        <div class="map-wrapper">
-          <div id="map"></div>
-          <button id="floatingLocationBtn" class="map-control-btn" title="موقعي الحالي">
-            <i class="fas fa-location-arrow"></i>
-          </button>
+
+        <div id="map"></div>
+        <div class="filter-bar">
+          <select id="sportFilter" class="filter-select"></select>
+          <div class="add-sport-group">
+            <input type="text" id="newSportInput" placeholder="رياضة جديدة" style="flex:1;">
+            <button type="button" id="addSportBtn"><i class="fas fa-plus"></i></button>
+          </div>
+          <button id="filterBtn" class="btn btn-primary" style="width:auto; padding:12px 24px;"><i class="fas fa-search"></i> بحث</button>
         </div>
-        
-        <!-- البطاقات السفلية (قابلة للتمرير الأفقي) -->
-        <div class="cards-container" id="venuesList"></div>
-        
-        <!-- شريط العملة وسلة التسوق -->
-        <div class="bottom-bar">
-          <div class="currency-panel">
-            <span class="currency-badge" id="currencyNotice"><i class="fas fa-globe"></i> العملة: ريال سعودي (SAR)</span>
-            <select id="manualCurrencySelect" class="currency-select">
-              <option value="SAR">ريال سعودي</option>
-              <option value="AED">درهم إماراتي</option>
-              <option value="EGP">جنيه مصري</option>
-              <option value="USD">دولار أمريكي</option>
-              <option value="EUR">يورو</option>
+        <div id="venuesList" class="venues-grid"></div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:16px;">
+          <div class="currency-notice" id="currencyNotice"></div>
+          <div class="currency-selector">
+            <label for="manualCurrencySelect">تغيير العملة:</label>
+            <select id="manualCurrencySelect" class="filter-select" style="width:auto; padding:8px 12px;">
+              <option value="SAR">ريال سعودي (SAR)</option>
+              <option value="AED">درهم إماراتي (AED)</option>
+              <option value="EGP">جنيه مصري (EGP)</option>
+              <option value="USD">دولار أمريكي (USD)</option>
+              <option value="EUR">يورو (EUR)</option>
             </select>
           </div>
-          <div class="cart-panel" id="cartSection">
-            <div class="cart-summary">
-              <i class="fas fa-shopping-cart"></i>
-              <span data-i18n="cart">السلة</span>
-              <span id="cartCount" class="badge">0</span>
-            </div>
-            <div class="cart-total">
-              <span id="cartTotal">0</span> <span id="cartCurrency">ريال</span>
-            </div>
-            <button id="checkoutCartBtn" class="btn btn-primary btn-sm" disabled data-i18n="checkout">إتمام الحجز</button>
-          </div>
         </div>
-        
-        <!-- حجوزات العميل (تظهر بعد تسجيل الدخول) -->
-        <div class="customer-bookings" id="customerBookingsSection" style="display:none;">
-          <h3><i class="fas fa-calendar-check"></i> <span data-i18n="myBookings">حجوزاتي</span></h3>
-          <div id="customerBookingsList" class="bookings-list"></div>
+      </div>
+      
+      <!-- سلة الحجوزات -->
+      <div class="card" id="cartSection">
+        <h2><i class="fas fa-shopping-cart"></i> سلة الحجوزات <span id="cartCount" class="badge">0</span></h2>
+        <div id="cartItemsList"></div>
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          <strong>الإجمالي: <span id="cartTotal">0</span> <span id="cartCurrency">ريال</span></strong>
+          <button id="checkoutCartBtn" class="btn btn-primary" style="width:auto;" disabled>إتمام حجز الكل</button>
         </div>
+      </div>
+      
+      <div class="card" id="customerBookingsSection" style="display:none;">
+        <h2><i class="fas fa-calendar-check"></i> حجوزاتي</h2>
+        <div id="customerBookingsList"></div>
       </div>
     </section>
 
     <!-- صفحة تسجيل منشأة -->
     <section id="registerVenue" class="section">
-      <div class="card form-card">
-        <h2><i class="fas fa-store"></i> <span data-i18n="registerVenue">تسجيل منشأة رياضية</span></h2>
+      <div class="card">
+        <h2><i class="fas fa-store"></i> تسجيل منشأة رياضية</h2>
         <form id="registerVenueForm">
-          <div class="form-row">
-            <div class="form-group">
-              <label>اسم المنشأة</label>
-              <input type="text" id="venueName" required>
-            </div>
-            <div class="form-group">
-              <label>رقم الهاتف</label>
-              <input type="tel" id="venuePhone" placeholder="9665xxxxxxxx" required>
-            </div>
-          </div>
-          <div class="form-group">
-            <label>وصف المنشأة</label>
-            <textarea id="venueDesc" rows="3"></textarea>
-          </div>
-          <div class="form-group">
-            <label>صورة المنشأة</label>
-            <input type="file" id="venueImage" accept="image/*">
-          </div>
+          <div class="form-group"><label>اسم المنشأة</label><input type="text" id="venueName" required></div>
+          <div class="form-group"><label>وصف</label><textarea id="venueDesc"></textarea></div>
+          <div class="form-group"><label>صورة</label><input type="file" id="venueImage" accept="image/*"></div>
+          
           <div class="form-group">
             <label><i class="fas fa-map-pin"></i> الموقع الجغرافي</label>
-            <div class="map-input-group">
+            <div style="display:flex; gap:8px; margin-bottom:8px;">
               <input type="text" id="venueLat" placeholder="خط العرض" readonly required>
               <input type="text" id="venueLng" placeholder="خط الطول" readonly required>
-              <button type="button" id="getVenueLocationBtn" class="btn-outline btn-sm"><i class="fas fa-location-dot"></i> تحديد موقعي</button>
             </div>
-            <div class="register-map-container">
-              <div id="registerMiniMap"></div>
-            </div>
-            <small>اسحب العلامة لتحديد الموقع بدقة</small>
+            <button type="button" id="getVenueLocationBtn" class="btn-sm" style="margin-bottom:8px;"><i class="fas fa-location-dot"></i> تحديد موقعي الحالي (GPS)</button>
+            <div class="register-map-container"><div id="registerMiniMap"></div></div>
+            <small>اسحب العلامة لتحديد الموقع</small>
           </div>
+          
+          <div class="form-group"><label>رقم الهاتف (مع رمز الدولة)</label><input type="tel" id="venuePhone" placeholder="9665xxxxxxxx" required></div>
+          
           <div class="form-group">
-            <label>تسعير الساعات الافتراضي (<span id="currencySymbol1">ريال</span>/ساعة)</label>
-            <div class="pricing-grid">
-              <div><label>12ص - 7ص</label><input type="number" id="pricePeriod1" value="40" min="0" step="5"></div>
-              <div><label>7ص - 11ص</label><input type="number" id="pricePeriod2" value="50" min="0" step="5"></div>
-              <div><label>11ص - 4م</label><input type="number" id="pricePeriod3" value="60" min="0" step="5"></div>
-              <div><label>4م - 12ص</label><input type="number" id="pricePeriod4" value="70" min="0" step="5"></div>
+            <label><i class="fas fa-money-bill"></i> تسعير الساعات الافتراضي للمنشأة (<span id="currencySymbol1">ريال</span>/ساعة)</label>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+              <div><label>الفترة الليلية (12:00ص - 7:00ص)</label><input type="number" id="pricePeriod1" min="0" value="40" step="5"></div>
+              <div><label>الصباح الباكر (7:00ص - 11:00ص)</label><input type="number" id="pricePeriod2" min="0" value="50" step="5"></div>
+              <div><label>الظهيرة (11:00ص - 4:00م)</label><input type="number" id="pricePeriod3" min="0" value="60" step="5"></div>
+              <div><label>المساء (4:00م - 12:00ص)</label><input type="number" id="pricePeriod4" min="0" value="70" step="5"></div>
             </div>
           </div>
+          
+          <!-- قسم الملاعب -->
           <div class="form-group">
             <label><i class="fas fa-futbol"></i> الملاعب التابعة</label>
-            <div id="courtsListContainer" class="courts-list"></div>
+            <div id="courtsListContainer"></div>
             <button type="button" id="addCourtBtn" class="btn-outline btn-sm"><i class="fas fa-plus"></i> إضافة ملعب</button>
           </div>
-          <button type="submit" class="btn btn-primary btn-block">تسجيل المنشأة</button>
+          
+          <button type="submit" class="btn btn-primary">تسجيل المنشأة والملاعب</button>
         </form>
       </div>
     </section>
 
-    <!-- صفحة تسجيل مدرب -->
+    <!-- صفحة تسجيل مدرب خصوصي -->
     <section id="registerCoach" class="section">
-      <div class="card form-card">
-        <h2><i class="fas fa-chalkboard-user"></i> <span data-i18n="registerCoach">تسجيل مدرب خصوصي</span></h2>
+      <div class="card">
+        <h2><i class="fas fa-chalkboard-user"></i> تسجيل مدرب خصوصي</h2>
         <form id="registerCoachForm">
-          <div class="form-row">
-            <div class="form-group">
-              <label>الاسم الكامل</label>
-              <input type="text" id="coachName" required>
-            </div>
-            <div class="form-group">
-              <label>الرياضة المتخصصة</label>
-              <select id="coachSport"></select>
-            </div>
-          </div>
-          <div class="form-group">
-            <label>وصف</label>
-            <textarea id="coachDesc" rows="3"></textarea>
-          </div>
-          <div class="form-group">
-            <label>صورة شخصية</label>
-            <input type="file" id="coachImage" accept="image/*">
-          </div>
+          <div class="form-group"><label>الاسم الكامل</label><input type="text" id="coachName" required></div>
+          <div class="form-group"><label>الرياضة المتخصصة</label><select id="coachSport"></select></div>
+          <div class="form-group"><label>وصف</label><textarea id="coachDesc"></textarea></div>
+          <div class="form-group"><label>صورة</label><input type="file" id="coachImage" accept="image/*"></div>
           <div class="form-group">
             <label><i class="fas fa-map-pin"></i> الموقع الجغرافي</label>
-            <div class="map-input-group">
+            <div style="display:flex; gap:8px; margin-bottom:8px;">
               <input type="text" id="coachLat" placeholder="خط العرض" readonly required>
               <input type="text" id="coachLng" placeholder="خط الطول" readonly required>
-              <button type="button" id="getCoachLocationBtn" class="btn-outline btn-sm"><i class="fas fa-location-dot"></i> تحديد موقعي</button>
             </div>
-            <div class="register-map-container">
-              <div id="coachRegisterMap"></div>
-            </div>
+            <button type="button" id="getCoachLocationBtn" class="btn-sm"><i class="fas fa-location-dot"></i> تحديد موقعي الحالي</button>
+            <div class="register-map-container"><div id="coachRegisterMap"></div></div>
+            <small>اسحب العلامة لتحديد الموقع</small>
           </div>
-          <div class="form-row">
-            <div class="form-group">
-              <label>رقم الهاتف</label>
-              <input type="tel" id="coachPhone" placeholder="9665xxxxxxxx" required>
-            </div>
-            <div class="form-group">
-              <label>سعر الساعة (<span id="coachCurrencySymbol">ريال</span>)</label>
-              <input type="number" id="coachHourlyRate" value="100" min="0" step="10" required>
-            </div>
-          </div>
-          <button type="submit" class="btn btn-primary btn-block">تسجيل كمدرب</button>
+          <div class="form-group"><label>رقم الهاتف (مع رمز الدولة)</label><input type="tel" id="coachPhone" placeholder="9665xxxxxxxx" required></div>
+          <div class="form-group"><label>سعر الساعة (<span id="coachCurrencySymbol">ريال</span>)</label><input type="number" id="coachHourlyRate" min="0" value="100" step="10" required></div>
+          <button type="submit" class="btn btn-primary">تسجيل كمدرب</button>
         </form>
       </div>
     </section>
@@ -272,45 +216,62 @@
     </section>
   </main>
 
-  <!-- ========== المودالات ========== -->
-  <!-- مودال المصادقة -->
-  <div class="modal" id="authModal">
+  <!-- المودالات -->
+  <!-- تعديل منشأة -->
+  <div class="modal" id="editVenueModal">
     <div class="modal-card">
-      <h3 id="authModalTitle">تسجيل الدخول</h3>
-      <form id="authForm">
-        <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="authEmail" required></div>
-        <div class="form-group"><label>كلمة المرور</label><input type="password" id="authPassword" required></div>
-        <div class="form-group" id="authNameGroup" style="display:none;"><label>الاسم</label><input type="text" id="authName"></div>
-        <div class="form-group" id="authPhoneGroup" style="display:none;"><label>رقم الهاتف</label><input type="tel" id="authPhone"></div>
-        <div class="form-group"><label>نوع الحساب</label>
-          <select id="authRole">
-            <option value="customer">عميل</option>
-            <option value="venue">منشأة</option>
-            <option value="coach">مدرب خصوصي</option>
-            <option value="admin">أدمن</option>
-          </select>
+      <h3><i class="fas fa-edit"></i> تعديل بيانات المنشأة</h3>
+      <form id="editVenueForm">
+        <input type="hidden" id="editVenueId">
+        <div class="form-group"><label>اسم المنشأة</label><input type="text" id="editVenueName" required></div>
+        <div class="form-group"><label>وصف</label><textarea id="editVenueDesc"></textarea></div>
+        <div class="form-group"><label>صورة (اترك فارغًا للإبقاء على الحالية)</label><input type="file" id="editVenueImage" accept="image/*"></div>
+        <div class="form-group">
+          <label>الموقع الجغرافي</label>
+          <div style="display:flex; gap:8px; margin-bottom:8px;">
+            <input type="text" id="editVenueLat" placeholder="خط العرض" readonly required>
+            <input type="text" id="editVenueLng" placeholder="خط الطول" readonly required>
+          </div>
+          <button type="button" id="editGetLocationBtn" class="btn-sm" style="margin-bottom:8px;"><i class="fas fa-location-dot"></i> استخدام GPS</button>
+          <div class="register-map-container"><div id="editMiniMap"></div></div>
         </div>
-        <div class="form-group" id="adminCodeGroup" style="display:none;"><label>رمز الأدمن</label><input type="password" id="adminCode"></div>
-        <input type="hidden" id="authMode" value="login">
-        <button type="submit" class="btn btn-primary btn-block">دخول</button>
-        <button type="button" id="switchAuthModeBtn" class="btn-outline btn-block">إنشاء حساب جديد</button>
-        <button type="button" id="closeAuthModal" class="btn-outline btn-block">إلغاء</button>
+        <div class="form-group"><label>رقم الهاتف</label><input type="tel" id="editVenuePhone" required></div>
+        <div class="form-group">
+          <label>تسعير الساعات (<span id="currencySymbol2">ريال</span>/ساعة)</label>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div><label>الفترة 1 (12ص - 7ص)</label><input type="number" id="editPricePeriod1" min="0" step="5"></div>
+            <div><label>الفترة 2 (7ص - 11ص)</label><input type="number" id="editPricePeriod2" min="0" step="5"></div>
+            <div><label>الفترة 3 (11ص - 4م)</label><input type="number" id="editPricePeriod3" min="0" step="5"></div>
+            <div><label>الفترة 4 (4م - 12ص)</label><input type="number" id="editPricePeriod4" min="0" step="5"></div>
+          </div>
+        </div>
+        <!-- قسم ساعات العمل الأسبوعية -->
+        <div class="form-group">
+          <label><i class="fas fa-clock"></i> ساعات العمل الأسبوعية</label>
+          <p class="text-muted small">اترك الحقل فارغاً إذا كانت المنشأة تعمل 24 ساعة في هذا اليوم</p>
+          <div id="workingHoursContainer" style="display:grid; gap:8px;"></div>
+        </div>
+        <button type="submit" class="btn btn-primary">حفظ التعديلات</button>
+        <button type="button" id="closeEditModalBtn" class="btn-outline">إلغاء</button>
       </form>
     </div>
   </div>
 
-  <!-- مودال الحجز -->
+  <!-- حجز (يدعم الملاعب والمدربين والتكرار) -->
   <div class="modal" id="bookingModal">
     <div class="modal-card">
       <h3>حجز موعد</h3>
       <form id="bookingForm">
-        <input type="hidden" id="bookingVenueId"><input type="hidden" id="bookingCourtId"><input type="hidden" id="bookingCoachId"><input type="hidden" id="bookingType">
-        <div class="form-row">
-          <div class="form-group"><label>التاريخ</label><input type="date" id="bookingDate" required></div>
-          <div class="form-group"><label>الوقت</label><input type="time" id="bookingTime" required></div>
-        </div>
+        <input type="hidden" id="bookingVenueId">
+        <input type="hidden" id="bookingCourtId">
+        <input type="hidden" id="bookingCoachId">
+        <input type="hidden" id="bookingType" value="court">
+        <div class="form-group"><label>التاريخ</label><input type="date" id="bookingDate" required></div>
+        <div class="form-group"><label>الوقت</label><input type="time" id="bookingTime" required></div>
         <div class="form-group"><label>المدة (ساعة)</label><input type="number" id="bookingDuration" value="1" min="1" max="4"></div>
-        <div class="form-group"><label>التكرار</label>
+        <!-- خيار التكرار -->
+        <div class="form-group">
+          <label>التكرار</label>
           <select id="bookingRecurring">
             <option value="none">مرة واحدة</option>
             <option value="weekly">أسبوعي</option>
@@ -318,66 +279,46 @@
           </select>
         </div>
         <div class="form-group" id="recurringEndGroup" style="display:none;">
-          <label>تاريخ الانتهاء</label><input type="date" id="recurringEndDate">
+          <label>تاريخ الانتهاء</label>
+          <input type="date" id="recurringEndDate">
         </div>
-        <div id="distanceTimeInfo" class="info-box"></div>
+        <div id="distanceTimeInfo" style="margin:12px 0; padding:12px; background:#f1f5f9; border-radius:12px;"></div>
         <div class="timeline-container">
           <div class="timeline-title"><i class="fas fa-clock"></i> حالة الحجوزات والأسعار</div>
           <div id="timelineDisplay" class="timeline"></div>
+          <div style="display:flex; flex-wrap:wrap; gap:16px; margin:12px 0;">
+            <span><span style="background:#10b981; padding:2px 8px; border-radius:20px;">&nbsp;</span> متاح</span>
+            <span><span style="background:#ef4444; padding:2px 8px; border-radius:20px;">&nbsp;</span> محجوز</span>
+            <span><span style="background:#cbd5e1; padding:2px 8px; border-radius:20px;">&nbsp;</span> غير متاح</span>
+          </div>
           <div id="pricingSummary" class="pricing-summary"></div>
-          <p class="total-price">الإجمالي: <span id="bookingPrice">0</span> <span id="bookingCurrency">ريال</span></p>
+          <p>السعر الإجمالي: <span id="bookingPrice">0</span> <span id="bookingCurrency">ريال</span> (شامل 15% رسوم تطبيق)</p>
         </div>
-        <div class="modal-actions">
+        <div style="display:flex; gap:8px;">
           <button type="submit" class="btn btn-primary">أضف إلى السلة</button>
-          <button type="button" id="bookNowDirectBtn" class="btn btn-success">احجز الآن</button>
-          <button type="button" id="closeBookingModal" class="btn-outline">إلغاء</button>
+          <button type="button" id="bookNowDirectBtn" class="btn btn-primary" style="background:#10b981;">احجز الآن</button>
         </div>
+        <button type="button" id="closeBookingModal" class="btn-outline">إلغاء</button>
       </form>
     </div>
   </div>
 
-  <!-- مودال الدفع -->
-  <div class="modal" id="paymentModal">
-    <div class="modal-card">
-      <h3>تأكيد الدفع</h3>
-      <div id="paymentDetails"></div>
-      <div class="form-group">
-        <label>كود الخصم</label>
-        <div class="promo-input">
-          <input type="text" id="promoCodeInput" placeholder="أدخل الكود">
-          <button type="button" id="applyPromoBtn" class="btn-outline btn-sm">تطبيق</button>
-        </div>
-        <div id="promoMessage"></div>
-      </div>
-      <div class="form-group"><label>رقم البطاقة</label><input type="text" id="cardNumber" placeholder="4242 4242 4242 4242"></div>
-      <div class="form-row">
-        <div class="form-group"><label>انتهاء</label><input type="text" id="cardExpiry" placeholder="MM/YY"></div>
-        <div class="form-group"><label>CVV</label><input type="text" id="cardCvv" placeholder="123"></div>
-      </div>
-      <div class="modal-actions">
-        <button id="confirmPaymentBtn" class="btn btn-primary">تأكيد الدفع</button>
-        <button id="cancelPaymentBtn" class="btn-outline">إلغاء</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- مودال إدارة الحجز -->
+  <!-- إدارة حجز -->
   <div class="modal" id="manageBookingModal">
     <div class="modal-card">
       <h3 id="manageBookingTitle">تعديل الحجز</h3>
       <form id="manageBookingForm">
-        <input type="hidden" id="manageBookingId"><input type="hidden" id="manageBookingType">
-        <div class="form-row">
-          <div class="form-group"><label>التاريخ</label><input type="date" id="manageBookingDate" required></div>
-          <div class="form-group"><label>الوقت</label><input type="time" id="manageBookingTime" required></div>
-        </div>
-        <div class="form-group"><label>المدة</label><input type="number" id="manageBookingDuration" min="1" max="4" required></div>
-        <p>السعر الجديد: <span id="manageBookingPrice">0</span> <span id="manageBookingCurrency">ريال</span></p>
-        <div class="modal-actions">
-          <button type="submit" class="btn btn-primary">حفظ</button>
+        <input type="hidden" id="manageBookingId">
+        <input type="hidden" id="manageBookingType">
+        <div class="form-group"><label>التاريخ</label><input type="date" id="manageBookingDate" required></div>
+        <div class="form-group"><label>الوقت</label><input type="time" id="manageBookingTime" required></div>
+        <div class="form-group"><label>المدة (ساعة)</label><input type="number" id="manageBookingDuration" min="1" max="4" required></div>
+        <p>السعر الإجمالي الجديد: <span id="manageBookingPrice">0</span> <span id="manageBookingCurrency">ريال</span></p>
+        <div style="display:flex; gap:8px;">
+          <button type="submit" class="btn btn-primary">حفظ التعديلات</button>
           <button type="button" id="cancelBookingBtn" class="btn btn-danger">إلغاء الحجز</button>
-          <button type="button" id="closeManageModalBtn" class="btn-outline">إغلاق</button>
         </div>
+        <button type="button" id="closeManageModalBtn" class="btn-outline" style="margin-top:8px;">إغلاق</button>
       </form>
     </div>
   </div>
@@ -385,80 +326,161 @@
   <!-- مودال التقييم -->
   <div class="modal" id="ratingModal">
     <div class="modal-card">
-      <h3>تقييم</h3>
-      <input type="hidden" id="ratingTargetId"><input type="hidden" id="ratingBookingId"><input type="hidden" id="ratingType">
+      <h3><i class="fas fa-star"></i> تقييم المدرب/المنشأة</h3>
+      <input type="hidden" id="ratingTargetId">
+      <input type="hidden" id="ratingBookingId">
+      <input type="hidden" id="ratingType">
       <div class="rating-stars" id="ratingStars">
-        <i class="far fa-star" data-value="1"></i><i class="far fa-star" data-value="2"></i><i class="far fa-star" data-value="3"></i><i class="far fa-star" data-value="4"></i><i class="far fa-star" data-value="5"></i>
+        <i class="far fa-star" data-value="1"></i>
+        <i class="far fa-star" data-value="2"></i>
+        <i class="far fa-star" data-value="3"></i>
+        <i class="far fa-star" data-value="4"></i>
+        <i class="far fa-star" data-value="5"></i>
       </div>
-      <textarea id="ratingComment" placeholder="تعليقك (اختياري)" rows="2"></textarea>
-      <div class="modal-actions">
-        <button id="submitRatingBtn" class="btn btn-primary">إرسال</button>
-        <button id="closeRatingModal" class="btn-outline">لاحقاً</button>
+      <div class="form-group">
+        <label>تعليقك (اختياري)</label>
+        <textarea id="ratingComment" rows="2"></textarea>
       </div>
+      <button id="submitRatingBtn" class="btn btn-primary">إرسال التقييم</button>
+      <button id="closeRatingModal" class="btn-outline">لاحقاً</button>
     </div>
   </div>
 
-  <!-- مودال تعديل منشأة -->
-  <div class="modal" id="editVenueModal">
+  <!-- مودال إضافة/تعديل ملعب -->
+  <div class="modal" id="courtModal">
     <div class="modal-card">
-      <h3>تعديل المنشأة</h3>
-      <form id="editVenueForm">
-        <input type="hidden" id="editVenueId">
-        <div class="form-group"><label>الاسم</label><input type="text" id="editVenueName" required></div>
-        <div class="form-group"><label>وصف</label><textarea id="editVenueDesc"></textarea></div>
-        <div class="form-group"><label>صورة</label><input type="file" id="editVenueImage" accept="image/*"></div>
+      <h3 id="courtModalTitle">إضافة ملعب</h3>
+      <form id="courtForm">
+        <input type="hidden" id="courtId">
+        <input type="hidden" id="courtVenueId">
+        <div class="form-group"><label>اسم الملعب</label><input type="text" id="courtName" required></div>
         <div class="form-group">
-          <label>الموقع</label>
-          <div class="map-input-group">
-            <input type="text" id="editVenueLat" readonly required><input type="text" id="editVenueLng" readonly required>
-            <button type="button" id="editGetLocationBtn" class="btn-outline btn-sm">GPS</button>
+          <label>نوع الاستخدام</label>
+          <select id="courtType">
+            <option value="single">رياضة واحدة</option>
+            <option value="multi">متعدد الرياضات</option>
+          </select>
+        </div>
+        <div id="singleSportGroup">
+          <label>نوع الرياضة</label>
+          <select id="courtSport"></select>
+        </div>
+        <div id="multiSportGroup" style="display:none;">
+          <label>الرياضات المسموحة</label>
+          <div id="multiSportCheckboxes"></div>
+        </div>
+        <div class="form-group">
+          <label><input type="checkbox" id="useCustomPricing"> تسعير خاص بهذا الملعب</label>
+        </div>
+        <div id="customPricingGroup" style="display:none;">
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+            <div><label>الفترة 1</label><input type="number" id="courtPrice1" min="0" value="40" step="5"></div>
+            <div><label>الفترة 2</label><input type="number" id="courtPrice2" min="0" value="50" step="5"></div>
+            <div><label>الفترة 3</label><input type="number" id="courtPrice3" min="0" value="60" step="5"></div>
+            <div><label>الفترة 4</label><input type="number" id="courtPrice4" min="0" value="70" step="5"></div>
           </div>
-          <div class="register-map-container"><div id="editMiniMap"></div></div>
         </div>
-        <div class="form-group"><label>الهاتف</label><input type="tel" id="editVenuePhone" required></div>
-        <div class="form-group"><label>التسعير</label>
-          <div class="pricing-grid">
-            <div><input type="number" id="editPricePeriod1"></div><div><input type="number" id="editPricePeriod2"></div>
-            <div><input type="number" id="editPricePeriod3"></div><div><input type="number" id="editPricePeriod4"></div>
-          </div>
-        </div>
-        <div class="form-group"><label>ساعات العمل</label><div id="workingHoursContainer"></div></div>
-        <div class="modal-actions">
-          <button type="submit" class="btn btn-primary">حفظ</button>
-          <button type="button" id="closeEditModalBtn" class="btn-outline">إلغاء</button>
-        </div>
+        <button type="submit" class="btn btn-primary">حفظ</button>
+        <button type="button" id="closeCourtModalBtn" class="btn-outline">إلغاء</button>
       </form>
     </div>
   </div>
 
-  <!-- مودال الإشعارات -->
-  <div class="modal" id="notificationsModal">
+  <!-- مودال إعدادات توفر المدرب -->
+  <div class="modal" id="coachAvailabilityModal">
     <div class="modal-card">
-      <h3>الإشعارات</h3>
-      <div id="notificationsList"></div>
-      <button id="clearNotificationsBtn" class="btn-outline btn-sm">مسح الكل</button>
-      <button id="closeNotificationsModal" class="btn-outline">إغلاق</button>
+      <h3><i class="fas fa-calendar-alt"></i> ساعات العمل الأسبوعية</h3>
+      <p class="text-muted small">اترك الحقل فارغاً إذا كنت متاحاً 24 ساعة في هذا اليوم</p>
+      <div id="coachWorkingHoursContainer" style="display:grid; gap:8px;"></div>
+      <button id="saveCoachAvailabilityBtn" class="btn btn-primary">حفظ</button>
+      <button id="closeCoachAvailabilityModal" class="btn-outline">إلغاء</button>
     </div>
   </div>
 
-  <!-- مودال تأكيد عام -->
+  <!-- الإشعارات -->
+  <div class="modal" id="notificationsModal">
+    <div class="modal-card">
+      <h3><i class="fas fa-bell"></i> الإشعارات</h3>
+      <div id="notificationsList"></div>
+      <button id="clearNotificationsBtn" class="btn-outline btn-sm" style="margin-top:12px;">مسح الكل</button>
+      <button id="closeNotificationsModal" class="btn-outline" style="margin-top:8px;">إغلاق</button>
+    </div>
+  </div>
+
+  <!-- مصادقة -->
+  <div class="modal" id="authModal">
+    <div class="modal-card">
+      <h3 id="authModalTitle">تسجيل الدخول</h3>
+      <form id="authForm">
+        <div class="form-group"><label>البريد الإلكتروني</label><input type="email" id="authEmail" required></div>
+        <div class="form-group"><label>كلمة المرور</label><input type="password" id="authPassword" required></div>
+        <div class="form-group" id="authNameGroup" style="display:none;">
+          <label>الاسم</label>
+          <input type="text" id="authName">
+        </div>
+        <div class="form-group" id="authPhoneGroup" style="display:none;">
+          <label>رقم الهاتف (مع رمز الدولة)</label>
+          <input type="tel" id="authPhone" placeholder="9665xxxxxxxx">
+        </div>
+        <div class="form-group"><label>نوع الحساب</label>
+          <select id="authRole">
+            <option value="customer">عميل</option>
+            <option value="venue">منشأة</option>
+            <option value="coach">مدرب خصوصي</option>
+            <option value="admin">أدمن (رمز خاص)</option>
+          </select>
+        </div>
+        <div class="form-group" id="adminCodeGroup" style="display:none;"><label>رمز الأدمن</label><input type="password" id="adminCode"></div>
+        <input type="hidden" id="authMode" value="login">
+        <button type="submit" class="btn btn-primary">دخول</button>
+        <button type="button" id="switchAuthModeBtn" class="btn-outline" style="margin-top:12px;">إنشاء حساب جديد</button>
+        <button type="button" id="closeAuthModal" class="btn-outline">إلغاء</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- دفع محسن (مع حقل الكوبون) -->
+  <div class="modal" id="paymentModal">
+    <div class="modal-card">
+      <h3>تأكيد الدفع</h3>
+      <div id="paymentDetails"></div>
+      <div class="form-group">
+        <label>كود الخصم (اختياري)</label>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="promoCodeInput" placeholder="أدخل الكود" style="flex:1;">
+          <button type="button" id="applyPromoBtn" class="btn-outline btn-sm">تطبيق</button>
+        </div>
+        <div id="promoMessage"></div>
+      </div>
+      <div class="form-group">
+        <label>رقم البطاقة (تجريبي)</label>
+        <input type="text" id="cardNumber" placeholder="4242 4242 4242 4242" maxlength="19">
+      </div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+        <div class="form-group"><label>تاريخ الانتهاء</label><input type="text" id="cardExpiry" placeholder="MM/YY" maxlength="5"></div>
+        <div class="form-group"><label>CVV</label><input type="text" id="cardCvv" placeholder="123" maxlength="3"></div>
+      </div>
+      <button id="confirmPaymentBtn" class="btn btn-primary">تأكيد الدفع (وهمي)</button>
+      <button id="cancelPaymentBtn" class="btn-outline">إلغاء</button>
+    </div>
+  </div>
+
+  <!-- تأكيد عام -->
   <div class="modal" id="confirmModal">
     <div class="modal-card">
       <h3>تأكيد</h3>
       <p id="confirmMessage">هل أنت متأكد؟</p>
-      <div class="modal-actions">
-        <button id="confirmOkBtn" class="btn btn-danger">نعم</button>
-        <button id="confirmCancelBtn" class="btn-outline">إلغاء</button>
-      </div>
+      <button id="confirmOkBtn" class="btn btn-danger">نعم</button>
+      <button id="confirmCancelBtn" class="btn-outline">إلغاء</button>
     </div>
   </div>
 
-  <!-- Toast & Loader -->
   <div id="toast" class="toast-msg"></div>
-  <div id="globalLoader" class="loader-overlay" style="display:none;"><div class="loader"></div></div>
+  <div id="globalLoader" class="loader" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); z-index:3000;"></div>
 
-  <!-- السكربتات -->
+  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- ملف الجافاسكريبت الرئيسي -->
   <script src="app.js"></script>
 </body>
 </html>
