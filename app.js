@@ -1,4 +1,4 @@
-// app.js - الإصدار النهائي المتكامل مع جميع الميزات المتقدمة
+// app.js - الإصدار النهائي المتكامل مع جميع الميزات المتقدمة ونظام i18n الكامل
 (function(){
   "use strict";
 
@@ -77,40 +77,180 @@
   function showLoader() { document.getElementById('globalLoader').style.display = 'block'; }
   function hideLoader() { document.getElementById('globalLoader').style.display = 'none'; }
 
-  // ---------- دوال i18n (الترجمة) ----------
+  // ---------- دوال i18n (الترجمة المتكاملة) ----------
   let currentLanguage = 'ar';
   const i18n = {
     ar: {
+      // عام
       home: 'الرئيسية',
       profile: 'الملف الشخصي',
       favorites: 'المفضلة',
       logout: 'تسجيل الخروج',
-      // ... سيتم إضافتها لاحقًا
+      login: 'دخول',
+      register: 'حساب جديد',
+      venue: 'منشأة',
+      coach: 'مدرب',
+      customer: 'عميل',
+      admin: 'أدمن',
+      bookNow: 'احجز الآن',
+      addToCart: 'أضف إلى السلة',
+      checkout: 'إتمام حجز الكل',
+      save: 'حفظ',
+      cancel: 'إلغاء',
+      delete: 'حذف',
+      edit: 'تعديل',
+      close: 'إغلاق',
+      confirm: 'تأكيد',
+      search: 'بحث',
+      filter: 'تصفية',
+      all: 'الكل',
+      loading: 'جاري التحميل...',
+      // التنقل
+      registerVenue: 'تسجيل منشأة',
+      registerVenueTitle: 'تسجيل منشأة رياضية',
+      registerCoach: 'تسجيل كمدرب',
+      registerCoachTitle: 'تسجيل مدرب خصوصي',
+      venueDashboard: 'لوحة المنشأة',
+      coachDashboard: 'لوحة المدرب',
+      adminDashboard: 'لوحة الأدمن',
+      analytics: 'التحليلات',
+      courts: 'الملاعب',
+      coaches: 'المدربين',
+      cart: 'سلة الحجوزات',
+      myBookings: 'حجوزاتي',
+      // إجراءات
+      approve: 'قبول',
+      reject: 'رفض',
+      pending: 'بانتظار الموافقة',
+      confirmed: 'مؤكد',
+      cancelled: 'ملغي',
+      recurring: 'متكرر',
+      // إشعارات
+      welcome: 'أهلاً',
+      bookingConfirmed: 'تم تأكيد حجزك',
+      bookingCancelled: 'تم إلغاء حجزك',
+      locateMe: 'حدد موقعي وانتقل إليه',
+      explore: 'استكشف الملاعب والمدربين',
+      changeCurrency: 'تغيير العملة:',
+      total: 'الإجمالي:',
+      venues: 'المنشآت',
+      users: 'المستخدمين',
+      bookings: 'الحجوزات',
+      promos: 'الكوبونات',
+      finance: 'الماليات',
+      data: 'البيانات',
+      advanced: 'متقدم',
     },
     en: {
       home: 'Home',
       profile: 'Profile',
       favorites: 'Favorites',
       logout: 'Logout',
-      // ...
+      login: 'Login',
+      register: 'Register',
+      venue: 'Venue',
+      coach: 'Coach',
+      customer: 'Customer',
+      admin: 'Admin',
+      bookNow: 'Book Now',
+      addToCart: 'Add to Cart',
+      checkout: 'Checkout All',
+      save: 'Save',
+      cancel: 'Cancel',
+      delete: 'Delete',
+      edit: 'Edit',
+      close: 'Close',
+      confirm: 'Confirm',
+      search: 'Search',
+      filter: 'Filter',
+      all: 'All',
+      loading: 'Loading...',
+      registerVenue: 'Register Venue',
+      registerVenueTitle: 'Register Sports Venue',
+      registerCoach: 'Register as Coach',
+      registerCoachTitle: 'Register Private Coach',
+      venueDashboard: 'Venue Dashboard',
+      coachDashboard: 'Coach Dashboard',
+      adminDashboard: 'Admin Dashboard',
+      analytics: 'Analytics',
+      courts: 'Courts',
+      coaches: 'Coaches',
+      cart: 'Cart',
+      myBookings: 'My Bookings',
+      approve: 'Approve',
+      reject: 'Reject',
+      pending: 'Pending',
+      confirmed: 'Confirmed',
+      cancelled: 'Cancelled',
+      recurring: 'Recurring',
+      welcome: 'Welcome',
+      bookingConfirmed: 'Your booking has been confirmed',
+      bookingCancelled: 'Your booking has been cancelled',
+      locateMe: 'Locate Me',
+      explore: 'Explore Courts and Coaches',
+      changeCurrency: 'Change Currency:',
+      total: 'Total:',
+      venues: 'Venues',
+      users: 'Users',
+      bookings: 'Bookings',
+      promos: 'Promos',
+      finance: 'Finance',
+      data: 'Data',
+      advanced: 'Advanced',
     }
   };
-  
+
   function t(key) {
     return i18n[currentLanguage]?.[key] || key;
   }
-  
+
   function setLanguage(lang) {
     currentLanguage = lang;
     document.documentElement.lang = lang;
     document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-    // تحديث النصوص في الواجهة
+    localStorage.setItem('app_language', lang);
+    
+    const langText = document.getElementById('langText');
+    if (langText) langText.textContent = lang === 'ar' ? 'English' : 'العربية';
+    
     updateUITranslations();
   }
-  
+
   function updateUITranslations() {
-    // سيتم تنفيذها لاحقًا مع ربط العناصر
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+      const key = el.getAttribute('data-i18n');
+      if (key) el.textContent = t(key);
+    });
+    
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+      const key = el.getAttribute('data-i18n-placeholder');
+      if (key) el.placeholder = t(key);
+    });
+    
+    if (!currentUser) {
+      const loginBtn = document.getElementById('showLoginBtn');
+      const registerBtn = document.getElementById('showRegisterBtn');
+      if (loginBtn) loginBtn.innerHTML = `<i class="fas fa-sign-in-alt"></i> ${t('login')}`;
+      if (registerBtn) registerBtn.innerHTML = `<i class="fas fa-user-plus"></i> ${t('register')}`;
+    }
+    
+    updateUserArea();
+    updateNavigation();
   }
+
+  function initI18n() {
+    const savedLang = localStorage.getItem('app_language') || 'ar';
+    setLanguage(savedLang);
+    
+    const langBtn = document.getElementById('toggleLangBtn');
+    if (langBtn) {
+      langBtn.addEventListener('click', () => {
+        setLanguage(currentLanguage === 'ar' ? 'en' : 'ar');
+      });
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', initI18n);
 
   // ---------- API (محاكاة localStorage مع الجداول الجديدة) ----------
   const api = {
@@ -668,8 +808,8 @@
     document.getElementById('bookingModal').style.visibility = 'hidden';
     showPaymentModal(pendingBooking);
   }
-  
-    // ---------- تحديث الواجهة ----------
+
+  // ---------- تحديث الواجهة ----------
   async function refreshData() {
     showLoader();
     venues = await api.getVenues();
@@ -707,17 +847,17 @@
 
   function updateUserArea() {
     if (currentUser) {
-      let roleText = currentUser.role === 'admin' ? 'أدمن' : (currentUser.role === 'venue' ? 'منشأة' : (currentUser.role === 'coach' ? 'مدرب' : 'عميل'));
+      let roleText = currentUser.role === 'admin' ? t('admin') : (currentUser.role === 'venue' ? t('venue') : (currentUser.role === 'coach' ? t('coach') : t('customer')));
       const unread = getUnreadCount(currentUser.id);
       userArea.innerHTML = `
         <button class="btn-sm" id="notificationsBtn"><i class="fas fa-bell"></i> ${unread > 0 ? `<span id="notificationBadge" class="notification-badge">${unread}</span>` : ''}</button>
         <div class="user-info"><i class="fas fa-user"></i> ${sanitizeInput(currentUser.name)} (${roleText})</div>
-        <button class="btn-sm" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> خروج</button>
+        <button class="btn-sm" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> ${t('logout')}</button>
       `;
       document.getElementById('logoutBtn').addEventListener('click', logout);
       document.getElementById('notificationsBtn').addEventListener('click', openNotifications);
     } else {
-      userArea.innerHTML = `<div class="auth-buttons"><button class="btn-sm" id="showLoginBtn"><i class="fas fa-sign-in-alt"></i> دخول</button><button class="btn-sm" id="showRegisterBtn"><i class="fas fa-user-plus"></i> حساب جديد</button></div>`;
+      userArea.innerHTML = `<div class="auth-buttons"><button class="btn-sm" id="showLoginBtn"><i class="fas fa-sign-in-alt"></i> ${t('login')}</button><button class="btn-sm" id="showRegisterBtn"><i class="fas fa-user-plus"></i> ${t('register')}</button></div>`;
       document.getElementById('showLoginBtn')?.addEventListener('click', () => openAuthModal('login'));
       document.getElementById('showRegisterBtn')?.addEventListener('click', () => openAuthModal('register'));
     }
@@ -725,11 +865,11 @@
 
   function updateNavigation() {
     let navHtml = '';
-    if (!currentUser) navHtml = `<button class="nav-btn active" data-section="home"><i class="fas fa-home"></i> الرئيسية</button>`;
-    else if (currentUser.role === 'customer') navHtml = `<button class="nav-btn active" data-section="home"><i class="fas fa-home"></i> الرئيسية</button><button class="nav-btn" data-section="profile"><i class="fas fa-user"></i> الملف الشخصي</button><button class="nav-btn" data-section="favorites"><i class="fas fa-heart"></i> المفضلة</button>`;
-    else if (currentUser.role === 'venue') navHtml = `<button class="nav-btn" data-section="home"><i class="fas fa-home"></i> الرئيسية</button><button class="nav-btn" data-section="registerVenue"><i class="fas fa-plus-circle"></i> تسجيل منشأة</button><button class="nav-btn active" data-section="venueDashboard"><i class="fas fa-calendar-alt"></i> لوحة التحكم</button><button class="nav-btn" data-section="profile"><i class="fas fa-user"></i> الملف الشخصي</button>`;
-    else if (currentUser.role === 'coach') navHtml = `<button class="nav-btn" data-section="home"><i class="fas fa-home"></i> الرئيسية</button><button class="nav-btn" data-section="registerCoach"><i class="fas fa-plus-circle"></i> تسجيل كمدرب</button><button class="nav-btn active" data-section="coachDashboard"><i class="fas fa-chalkboard-user"></i> لوحة المدرب</button><button class="nav-btn" data-section="profile"><i class="fas fa-user"></i> الملف الشخصي</button>`;
-    else if (currentUser.role === 'admin') navHtml = `<button class="nav-btn" data-section="home"><i class="fas fa-home"></i> الرئيسية</button><button class="nav-btn" data-section="registerVenue"><i class="fas fa-plus-circle"></i> منشأة</button><button class="nav-btn" data-section="registerCoach"><i class="fas fa-plus-circle"></i> مدرب</button><button class="nav-btn" data-section="venueDashboard"><i class="fas fa-calendar-alt"></i> منشأة</button><button class="nav-btn" data-section="coachDashboard"><i class="fas fa-chalkboard-user"></i> مدرب</button><button class="nav-btn active" data-section="adminDashboard"><i class="fas fa-user-shield"></i> لوحة الأدمن</button><button class="nav-btn" data-section="profile"><i class="fas fa-user"></i> الملف الشخصي</button><button class="nav-btn" data-section="analytics"><i class="fas fa-chart-bar"></i> التحليلات</button>`;
+    if (!currentUser) navHtml = `<button class="nav-btn active" data-section="home"><i class="fas fa-home"></i> ${t('home')}</button>`;
+    else if (currentUser.role === 'customer') navHtml = `<button class="nav-btn active" data-section="home"><i class="fas fa-home"></i> ${t('home')}</button><button class="nav-btn" data-section="profile"><i class="fas fa-user"></i> ${t('profile')}</button><button class="nav-btn" data-section="favorites"><i class="fas fa-heart"></i> ${t('favorites')}</button>`;
+    else if (currentUser.role === 'venue') navHtml = `<button class="nav-btn" data-section="home"><i class="fas fa-home"></i> ${t('home')}</button><button class="nav-btn" data-section="registerVenue"><i class="fas fa-plus-circle"></i> ${t('registerVenue')}</button><button class="nav-btn active" data-section="venueDashboard"><i class="fas fa-calendar-alt"></i> ${t('venueDashboard')}</button><button class="nav-btn" data-section="profile"><i class="fas fa-user"></i> ${t('profile')}</button>`;
+    else if (currentUser.role === 'coach') navHtml = `<button class="nav-btn" data-section="home"><i class="fas fa-home"></i> ${t('home')}</button><button class="nav-btn" data-section="registerCoach"><i class="fas fa-plus-circle"></i> ${t('registerCoach')}</button><button class="nav-btn active" data-section="coachDashboard"><i class="fas fa-chalkboard-user"></i> ${t('coachDashboard')}</button><button class="nav-btn" data-section="profile"><i class="fas fa-user"></i> ${t('profile')}</button>`;
+    else if (currentUser.role === 'admin') navHtml = `<button class="nav-btn" data-section="home"><i class="fas fa-home"></i> ${t('home')}</button><button class="nav-btn" data-section="registerVenue"><i class="fas fa-plus-circle"></i> ${t('registerVenue')}</button><button class="nav-btn" data-section="registerCoach"><i class="fas fa-plus-circle"></i> ${t('registerCoach')}</button><button class="nav-btn" data-section="venueDashboard"><i class="fas fa-calendar-alt"></i> ${t('venueDashboard')}</button><button class="nav-btn" data-section="coachDashboard"><i class="fas fa-chalkboard-user"></i> ${t('coachDashboard')}</button><button class="nav-btn active" data-section="adminDashboard"><i class="fas fa-user-shield"></i> ${t('adminDashboard')}</button><button class="nav-btn" data-section="profile"><i class="fas fa-user"></i> ${t('profile')}</button><button class="nav-btn" data-section="analytics"><i class="fas fa-chart-bar"></i> ${t('analytics')}</button>`;
     mainNav.innerHTML = navHtml;
     document.querySelectorAll('.nav-btn').forEach(btn => btn.addEventListener('click', () => switchSection(btn.dataset.section)));
   }
@@ -785,7 +925,7 @@
   // ---------- مصادقة ----------
   function openAuthModal(mode) {
     document.getElementById('authMode').value = mode;
-    document.getElementById('authModalTitle').textContent = mode === 'login' ? 'تسجيل الدخول' : 'إنشاء حساب';
+    document.getElementById('authModalTitle').textContent = mode === 'login' ? t('login') : t('register');
     document.getElementById('authNameGroup').style.display = mode === 'register' ? 'block' : 'none';
     const phoneGroup = document.getElementById('authPhoneGroup');
     if (phoneGroup) phoneGroup.style.display = mode === 'register' ? 'block' : 'none';
@@ -833,7 +973,7 @@
       if (user.blocked) { hideLoader(); return showToast('هذا الحساب محظور', false); }
       await api.setSession(user);
       currentUser = user;
-      showToast(`أهلاً ${user.name}`);
+      showToast(`${t('welcome')} ${user.name}`);
     }
     document.getElementById('authModal').style.visibility = 'hidden';
     await refreshData();
@@ -851,8 +991,8 @@
   document.getElementById('closeAuthModal').addEventListener('click', () => {
     document.getElementById('authModal').style.visibility = 'hidden';
   });
-
-  // ---------- GPS ----------
+  
+    // ---------- GPS ----------
   document.getElementById('getCustomerLocationBtn')?.addEventListener('click', () => {
     if (!navigator.geolocation) return showToast('متصفحك لا يدعم GPS', false);
     navigator.geolocation.getCurrentPosition(pos => {
@@ -872,8 +1012,8 @@
   }
   
   function calculateTravelTime(dist) { return Math.round(dist / 80 * 60); }
-  
-    // ---------- عرض الملاعب والمدربين (مع أيقونات المفضلة) ----------
+
+  // ---------- عرض الملاعب والمدربين (مع أيقونات المفضلة) ----------
   function isFavorite(type, id) {
     if (!currentUser) return false;
     return favorites.some(f => f.userId === currentUser.id && f.itemType === type && f.itemId === id);
@@ -1208,7 +1348,7 @@
         +document.getElementById('pricePeriod4').value
       ],
       workingHours: null,
-      requiresApproval: false // افتراضي
+      requiresApproval: false
     };
     venues.push(newVenue);
     await api.saveVenues(venues);
@@ -1674,8 +1814,8 @@
       updateNotificationBadge();
     });
   }
-  
-    // ---------- مودال الإغلاقات (Blackouts) للملاعب والمدربين ----------
+
+  // ---------- مودال الإغلاقات (Blackouts) للملاعب والمدربين ----------
   function openBlackoutModal(type, id) {
     const modal = document.createElement('div');
     modal.className = 'modal';
@@ -1905,8 +2045,8 @@
   document.getElementById('closeCourtModalBtn').addEventListener('click', () => {
     document.getElementById('courtModal').style.visibility = 'hidden';
   });
-
-  // ---------- حجوزات العميل والتقييم (مع دعم الحجوزات المتكررة) ----------
+  
+    // ---------- حجوزات العميل والتقييم (مع دعم الحجوزات المتكررة) ----------
   function renderCustomerBookings() {
     if (!currentUser) return;
     const myCourtBookings = bookings.filter(b => b.customerId === currentUser.id);
@@ -2062,8 +2202,8 @@
   document.getElementById('closeRatingModal').addEventListener('click', () => {
     document.getElementById('ratingModal').style.visibility = 'hidden';
   });
-  
-    // ---------- إدارة حجز (ملاعب ومدربين) مع دعم الحجوزات المتكررة ----------
+
+  // ---------- إدارة حجز (ملاعب ومدربين) مع دعم الحجوزات المتكررة ----------
   function openManageBookingModal(bookingId, type) {
     const booking = type === 'court' ? bookings.find(b => b.id === bookingId) : coachBookings.find(b => b.id === bookingId);
     if (!booking) return;
@@ -2917,8 +3057,8 @@
     if (document.getElementById('venueDashboard').classList.contains('active')) loadVenueDashboard();
     if (currentViewMode === 'courts') renderCourts();
   });
-
-  // ---------- الملف الشخصي للمستخدم ----------
+  
+    // ---------- الملف الشخصي للمستخدم ----------
   function loadProfilePage() {
     if (!currentUser) {
       switchSection('home');
@@ -2935,7 +3075,7 @@
       section.className = 'section';
       section.innerHTML = `
         <div class="card">
-          <h2><i class="fas fa-user-circle"></i> الملف الشخصي</h2>
+          <h2><i class="fas fa-user-circle"></i> ${t('profile')}</h2>
           <div id="profileContent"></div>
         </div>
       `;
@@ -2960,42 +3100,42 @@
           <input type="file" id="profileImageUpload" accept="image/*" style="display:none;">
         </div>
         <h3 style="margin-top:12px;">${sanitizeInput(user.name)}</h3>
-        <p>${user.email} (${user.role})</p>
+        <p>${user.email} (${t(user.role)})</p>
       </div>
       
       <form id="profileForm">
         <div class="form-group">
-          <label>الاسم</label>
+          <label>${t('name')}</label>
           <input type="text" id="profileName" value="${sanitizeInput(user.name)}" required>
         </div>
         <div class="form-group">
-          <label>البريد الإلكتروني</label>
+          <label>${t('email')}</label>
           <input type="email" id="profileEmail" value="${user.email}" required>
         </div>
         <div class="form-group">
-          <label>رقم الهاتف</label>
+          <label>${t('phone')}</label>
           <input type="tel" id="profilePhone" value="${user.phone || ''}">
         </div>
-        <button type="submit" class="btn btn-primary">حفظ التغييرات</button>
+        <button type="submit" class="btn btn-primary">${t('saveChanges')}</button>
       </form>
       
       <hr style="margin:24px 0;">
       
-      <h4>تغيير كلمة المرور</h4>
+      <h4>${t('changePassword')}</h4>
       <form id="passwordForm">
         <div class="form-group">
-          <label>كلمة المرور الحالية</label>
+          <label>${t('currentPassword')}</label>
           <input type="password" id="currentPassword" required>
         </div>
         <div class="form-group">
-          <label>كلمة المرور الجديدة</label>
+          <label>${t('newPassword')}</label>
           <input type="password" id="newPassword" required>
         </div>
         <div class="form-group">
-          <label>تأكيد كلمة المرور الجديدة</label>
+          <label>${t('confirmPassword')}</label>
           <input type="password" id="confirmPassword" required>
         </div>
-        <button type="submit" class="btn btn-primary">تغيير كلمة المرور</button>
+        <button type="submit" class="btn btn-primary">${t('changePassword')}</button>
       </form>
     `;
     
@@ -3008,7 +3148,7 @@
           await api.saveUsers(users);
           renderProfileContent();
           updateUserArea();
-          showToast('تم تحديث الصورة الشخصية');
+          showToast(t('profileImageUpdated'));
         };
         reader.readAsDataURL(file);
       }
@@ -3021,7 +3161,7 @@
       const phone = document.getElementById('profilePhone').value.trim();
       
       if (email !== currentUser.email && users.some(u => u.email === email)) {
-        showToast('البريد الإلكتروني مستخدم مسبقاً', false);
+        showToast(t('emailAlreadyUsed'), false);
         return;
       }
       
@@ -3037,7 +3177,7 @@
       }
       
       updateUserArea();
-      showToast('تم تحديث الملف الشخصي');
+      showToast(t('profileUpdated'));
     });
     
     document.getElementById('passwordForm').addEventListener('submit', async (e) => {
@@ -3047,17 +3187,17 @@
       const confirmPass = document.getElementById('confirmPassword').value;
       
       if (currentUser.password !== currentPass) {
-        showToast('كلمة المرور الحالية غير صحيحة', false);
+        showToast(t('incorrectPassword'), false);
         return;
       }
       
       if (newPass !== confirmPass) {
-        showToast('كلمة المرور الجديدة غير متطابقة', false);
+        showToast(t('passwordsMismatch'), false);
         return;
       }
       
       if (newPass.length < 4) {
-        showToast('كلمة المرور يجب أن تكون 4 أحرف على الأقل', false);
+        showToast(t('passwordTooShort'), false);
         return;
       }
       
@@ -3070,15 +3210,15 @@
       }
       
       document.getElementById('passwordForm').reset();
-      showToast('تم تغيير كلمة المرور بنجاح');
+      showToast(t('passwordChanged'));
     });
   }
-  
-    // ---------- صفحة المفضلة ----------
+
+  // ---------- صفحة المفضلة ----------
   function loadFavoritesPage() {
     if (!currentUser) {
       switchSection('home');
-      showToast('يجب تسجيل الدخول', false);
+      showToast(t('loginRequired'), false);
       return;
     }
     
@@ -3090,7 +3230,7 @@
       section.className = 'section';
       section.innerHTML = `
         <div class="card">
-          <h2><i class="fas fa-heart"></i> المفضلة</h2>
+          <h2><i class="fas fa-heart"></i> ${t('favorites')}</h2>
           <div id="favoritesContent"></div>
         </div>
       `;
@@ -3106,7 +3246,7 @@
     const userFavorites = favorites.filter(f => f.userId === currentUser.id);
     
     if (userFavorites.length === 0) {
-      container.innerHTML = '<p>لا توجد عناصر في المفضلة</p>';
+      container.innerHTML = `<p>${t('noFavorites')}</p>`;
       return;
     }
     
@@ -3133,8 +3273,8 @@
             <div class="venue-name">${sanitizeInput(venue.name)}</div>
             <div class="venue-rating"><span style="color:#fbbf24;">${starsHtml}</span> ${avgRating}</div>
             <div class="venue-desc">${sanitizeInput(venue.desc || '')}</div>
-            <div class="venue-pricing">من ${minPrice} ${currencySymbol}/ساعة</div>
-            <button class="btn btn-primary view-venue-btn" data-venue-id="${venue.id}">عرض الملاعب</button>
+            <div class="venue-pricing">${t('from')} ${minPrice} ${currencySymbol}/${t('hour')}</div>
+            <button class="btn btn-primary view-venue-btn" data-venue-id="${venue.id}">${t('viewCourts')}</button>
           </div>
         </div>`;
       } else if (fav.itemType === 'coach') {
@@ -3154,8 +3294,8 @@
             <div class="coach-name">${sanitizeInput(coach.name)}</div>
             <div class="coach-sport">${getSportDisplayName(coach.sport)}</div>
             <div class="coach-rating"><span style="color:#fbbf24;">${starsHtml}</span> ${avgRating}</div>
-            <div class="coach-pricing">${coach.hourlyRate} ${currencySymbol}/ساعة</div>
-            <button class="btn btn-primary book-coach-btn" data-coach-id="${coach.id}">احجز جلسة</button>
+            <div class="coach-pricing">${coach.hourlyRate} ${currencySymbol}/${t('hour')}</div>
+            <button class="btn btn-primary book-coach-btn" data-coach-id="${coach.id}">${t('bookSession')}</button>
           </div>
         </div>`;
       }
@@ -3189,7 +3329,7 @@
   // ---------- لوحة التحليلات (Analytics) ----------
   function loadAnalyticsDashboard() {
     if (!currentUser || (currentUser.role !== 'admin' && currentUser.role !== 'venue' && currentUser.role !== 'coach')) {
-      showToast('غير مصرح', false);
+      showToast(t('unauthorized'), false);
       return;
     }
     
@@ -3201,7 +3341,7 @@
       section.className = 'section';
       section.innerHTML = `
         <div class="card">
-          <h2><i class="fas fa-chart-bar"></i> التحليلات والتقارير</h2>
+          <h2><i class="fas fa-chart-bar"></i> ${t('analytics')}</h2>
           <div id="analyticsContent"></div>
         </div>
       `;
@@ -3221,7 +3361,7 @@
     
     if (currentUser.role === 'admin') {
       dataSource = [...bookings, ...coachBookings];
-      title = 'جميع المنشآت والمدربين';
+      title = t('allVenuesAndCoaches');
     } else if (currentUser.role === 'venue') {
       const myVenues = venues.filter(v => v.ownerId === currentUser.id);
       dataSource = bookings.filter(b => myVenues.some(v => v.id === b.venueId));
@@ -3275,37 +3415,37 @@
     
     let html = `
       <div style="display:flex; justify-content:space-between; margin-bottom:24px;">
-        <button class="btn-outline btn-sm" id="exportExcelBtn"><i class="fas fa-file-excel"></i> تصدير Excel</button>
-        <button class="btn-outline btn-sm" id="exportPDFBtn"><i class="fas fa-file-pdf"></i> تصدير PDF</button>
+        <button class="btn-outline btn-sm" id="exportExcelBtn"><i class="fas fa-file-excel"></i> ${t('exportExcel')}</button>
+        <button class="btn-outline btn-sm" id="exportPDFBtn"><i class="fas fa-file-pdf"></i> ${t('exportPDF')}</button>
       </div>
       
       <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:24px;">
         <div class="card" style="padding:16px; text-align:center;">
           <h3>${totalRevenue.toFixed(2)} ${currencySymbol}</h3>
-          <p>إجمالي الإيرادات</p>
+          <p>${t('totalRevenue')}</p>
         </div>
         <div class="card" style="padding:16px; text-align:center;">
           <h3>${bookingCount}</h3>
-          <p>عدد الحجوزات</p>
+          <p>${t('bookingCount')}</p>
         </div>
         <div class="card" style="padding:16px; text-align:center;">
           <h3>${(totalRevenue / (bookingCount || 1)).toFixed(2)} ${currencySymbol}</h3>
-          <p>متوسط قيمة الحجز</p>
+          <p>${t('averageBookingValue')}</p>
         </div>
       </div>
       
       <div class="card" style="padding:16px; margin-bottom:24px;">
-        <h4>الإيرادات الشهرية</h4>
+        <h4>${t('monthlyRevenue')}</h4>
         <canvas id="revenueChart" style="max-height:300px;"></canvas>
       </div>
       
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
         <div class="card" style="padding:16px;">
-          <h4>الرياضات الأكثر طلباً</h4>
+          <h4>${t('popularSports')}</h4>
           <canvas id="sportChart" style="max-height:250px;"></canvas>
         </div>
         <div class="card" style="padding:16px;">
-          <h4>الأوقات الأكثر ازدحاماً</h4>
+          <h4>${t('peakHours')}</h4>
           <canvas id="hourChart" style="max-height:250px;"></canvas>
         </div>
       </div>
@@ -3331,7 +3471,7 @@
           data: {
             labels: months,
             datasets: [{
-              label: 'الإيرادات',
+              label: t('revenue'),
               data: revenues,
               borderColor: '#38bdf8',
               backgroundColor: 'rgba(56, 189, 248, 0.1)',
@@ -3359,7 +3499,7 @@
           data: {
             labels: Array.from({length: 24}, (_, i) => i + ':00'),
             datasets: [{
-              label: 'عدد الحجوزات',
+              label: t('bookings'),
               data: hourCounts,
               backgroundColor: '#38bdf8'
             }]
@@ -3371,9 +3511,9 @@
     // تصدير Excel
     document.getElementById('exportExcelBtn').addEventListener('click', () => {
       const data = [
-        ['التاريخ', 'الوقت', 'النوع', 'الاسم', 'العميل', 'السعر', 'الحالة'],
+        [t('date'), t('time'), t('type'), t('name'), t('customer'), t('price'), t('status')],
         ...confirmedBookings.map(b => [
-          b.date, b.time, b.type === 'court' ? 'ملعب' : 'مدرب',
+          b.date, b.time, b.type === 'court' ? t('court') : t('coach'),
           b.type === 'court' ? b.courtName : b.coachName,
           b.customerName, b.price, b.status
         ])
@@ -3381,8 +3521,8 @@
       
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.aoa_to_sheet(data);
-      XLSX.utils.book_append_sheet(wb, ws, 'الحجوزات');
-      XLSX.writeFile(wb, `تقرير_الحجوزات_${new Date().toISOString().slice(0,10)}.xlsx`);
+      XLSX.utils.book_append_sheet(wb, ws, t('bookings'));
+      XLSX.writeFile(wb, `${t('bookingsReport')}_${new Date().toISOString().slice(0,10)}.xlsx`);
     });
     
     // تصدير PDF
@@ -3391,9 +3531,9 @@
       const doc = new jsPDF();
       
       doc.setFont('Amiri');
-      doc.text(`تقرير التحليلات - ${title}`, 20, 20);
-      doc.text(`إجمالي الإيرادات: ${totalRevenue.toFixed(2)} ${currencySymbol}`, 20, 30);
-      doc.text(`عدد الحجوزات: ${bookingCount}`, 20, 40);
+      doc.text(`${t('analyticsReport')} - ${title}`, 20, 20);
+      doc.text(`${t('totalRevenue')}: ${totalRevenue.toFixed(2)} ${currencySymbol}`, 20, 30);
+      doc.text(`${t('bookingCount')}: ${bookingCount}`, 20, 40);
       
       let y = 60;
       confirmedBookings.slice(0, 20).forEach(b => {
@@ -3401,11 +3541,11 @@
         y += 10;
       });
       
-      doc.save(`تقرير_${new Date().toISOString().slice(0,10)}.pdf`);
+      doc.save(`${t('report')}_${new Date().toISOString().slice(0,10)}.pdf`);
     });
   }
-
-  // ---------- لوحة الأدمن الموسعة (تشمل جميع التبويبات) ----------
+  
+    // ---------- لوحة الأدمن الموسعة (تشمل جميع التبويبات) ----------
   async function loadAdminDashboard(tab = 'venues') {
     const content = document.getElementById('adminContent');
     if (!content) return;
@@ -3421,10 +3561,10 @@
     
     // --- التبويب: المنشآت ---
     if (tab === 'venues') {
-      html = `<button class="btn btn-primary" onclick="document.querySelector('[data-section=registerVenue]').click()">إضافة منشأة</button>
-        <table class="admin-table"><tr><th>الاسم</th><th>المالك</th><th>التقييم</th><th>إجراءات</th></tr>`;
+      html = `<button class="btn btn-primary" onclick="document.querySelector('[data-section=registerVenue]').click()">${t('addVenue')}</button>
+        <table class="admin-table"><tr><th>${t('name')}</th><th>${t('owner')}</th><th>${t('rating')}</th><th>${t('actions')}</th></tr>`;
       venues.forEach(v => {
-        const owner = users.find(u => u.id === v.ownerId)?.name || 'غير معروف';
+        const owner = users.find(u => u.id === v.ownerId)?.name || t('unknown');
         const venueReviews = reviews[v.id] || [];
         const avg = venueReviews.length > 0 ? (venueReviews.reduce((s, r) => s + r.rating, 0) / venueReviews.length).toFixed(1) : '-';
         html += `<tr><td>${sanitizeInput(v.name)}</td><td>${owner}</td><td>${avg} (${venueReviews.length})</td>
@@ -3437,7 +3577,7 @@
       content.querySelectorAll('.delete-venue-btn').forEach(btn => {
         btn.addEventListener('click', e => {
           const id = btn.dataset.id;
-          showConfirm('حذف المنشأة وحجوزاتها؟', async () => {
+          showConfirm(t('confirmDeleteVenue'), async () => {
             venues = venues.filter(v => v.id !== id);
             bookings = bookings.filter(b => b.venueId !== id);
             courts = courts.filter(c => c.venueId !== id);
@@ -3455,11 +3595,11 @@
     
     // --- التبويب: المستخدمين ---
     else if (tab === 'users') {
-      html = `<table class="admin-table"><tr><th>الاسم</th><th>البريد</th><th>الدور</th><th>الهاتف</th><th>الحالة</th><th>إجراءات</th></tr>`;
+      html = `<table class="admin-table"><tr><th>${t('name')}</th><th>${t('email')}</th><th>${t('role')}</th><th>${t('phone')}</th><th>${t('status')}</th><th>${t('actions')}</th></tr>`;
       users.forEach(u => {
-        html += `<tr><td>${sanitizeInput(u.name)}</td><td>${u.email}</td><td>${u.role}</td><td>${u.phone || '-'}</td>
-          <td>${u.blocked ? 'محظور' : 'نشط'}</td>
-          <td>${u.role !== 'admin' ? `<button class="btn-outline btn-sm toggle-block-btn" data-id="${u.id}">${u.blocked ? 'إلغاء الحظر' : 'حظر'}</button>
+        html += `<tr><td>${sanitizeInput(u.name)}</td><td>${u.email}</td><td>${t(u.role)}</td><td>${u.phone || '-'}</td>
+          <td>${u.blocked ? t('blocked') : t('active')}</td>
+          <td>${u.role !== 'admin' ? `<button class="btn-outline btn-sm toggle-block-btn" data-id="${u.id}">${u.blocked ? t('unblock') : t('block')}</button>
           <button class="btn-outline btn-sm delete-user-btn" data-id="${u.id}"><i class="fas fa-trash"></i></button>` : ''}</td></tr>`;
       });
       html += '</table>';
@@ -3468,7 +3608,7 @@
       content.querySelectorAll('.delete-user-btn').forEach(btn => {
         btn.addEventListener('click', e => {
           const id = btn.dataset.id;
-          showConfirm('حذف المستخدم؟', async () => {
+          showConfirm(t('confirmDeleteUser'), async () => {
             users = users.filter(u => u.id !== id);
             await api.saveUsers(users);
             loadAdminDashboard('users');
@@ -3483,7 +3623,7 @@
             user.blocked = !user.blocked;
             await api.saveUsers(users);
             loadAdminDashboard('users');
-            showToast(user.blocked ? 'تم حظر المستخدم' : 'تم إلغاء الحظر');
+            showToast(user.blocked ? t('userBlocked') : t('userUnblocked'));
           }
         });
       });
@@ -3491,13 +3631,13 @@
     
     // --- التبويب: الحجوزات (ملاعب + مدربين) ---
     else if (tab === 'bookings') {
-      html = `<h3>حجوزات الملاعب</h3><table class="admin-table"><tr><th>المنشأة</th><th>العميل</th><th>التاريخ</th><th>المبلغ</th><th>الحالة</th></tr>`;
+      html = `<h3>${t('courtBookings')}</h3><table class="admin-table"><tr><th>${t('venue')}</th><th>${t('customer')}</th><th>${t('date')}</th><th>${t('amount')}</th><th>${t('status')}</th></tr>`;
       bookings.forEach(b => {
-        html += `<tr><td>${sanitizeInput(b.venueName)}</td><td>${sanitizeInput(b.customerName)}</td><td>${b.date} ${b.time}</td><td>${b.price} ${currencySymbol}</td><td>${b.status || 'مؤكد'}</td></tr>`;
+        html += `<tr><td>${sanitizeInput(b.venueName)}</td><td>${sanitizeInput(b.customerName)}</td><td>${b.date} ${b.time}</td><td>${b.price} ${currencySymbol}</td><td>${b.status || t('confirmed')}</td></tr>`;
       });
-      html += `</table><h3 style="margin-top:24px;">جلسات التدريب</h3><table class="admin-table"><tr><th>المدرب</th><th>العميل</th><th>التاريخ</th><th>المبلغ</th><th>الحالة</th></tr>`;
+      html += `</table><h3 style="margin-top:24px;">${t('coachSessions')}</h3><table class="admin-table"><tr><th>${t('coach')}</th><th>${t('customer')}</th><th>${t('date')}</th><th>${t('amount')}</th><th>${t('status')}</th></tr>`;
       coachBookings.forEach(s => {
-        html += `<tr><td>${sanitizeInput(s.coachName)}</td><td>${sanitizeInput(s.customerName)}</td><td>${s.date} ${s.time}</td><td>${s.price} ${currencySymbol}</td><td>${s.status || 'مؤكد'}</td></tr>`;
+        html += `<tr><td>${sanitizeInput(s.coachName)}</td><td>${sanitizeInput(s.customerName)}</td><td>${s.date} ${s.time}</td><td>${s.price} ${currencySymbol}</td><td>${s.status || t('confirmed')}</td></tr>`;
       });
       html += '</table>';
       content.innerHTML = html;
@@ -3505,8 +3645,8 @@
     
     // --- التبويب: المدربين ---
     else if (tab === 'coaches') {
-      html = `<button class="btn btn-primary" onclick="document.querySelector('[data-section=registerCoach]').click()">إضافة مدرب</button>
-        <table class="admin-table"><tr><th>الاسم</th><th>الرياضة</th><th>سعر الساعة</th><th>التقييم</th><th>إجراءات</th></tr>`;
+      html = `<button class="btn btn-primary" onclick="document.querySelector('[data-section=registerCoach]').click()">${t('addCoach')}</button>
+        <table class="admin-table"><tr><th>${t('name')}</th><th>${t('sport')}</th><th>${t('hourlyRate')}</th><th>${t('rating')}</th><th>${t('actions')}</th></tr>`;
       coaches.forEach(c => {
         const coachRatingList = coachReviews[c.id] || [];
         const avg = coachRatingList.length > 0 ? (coachRatingList.reduce((s, r) => s + r.rating, 0) / coachRatingList.length).toFixed(1) : '-';
@@ -3520,7 +3660,7 @@
       content.querySelectorAll('.delete-coach-btn').forEach(btn => {
         btn.addEventListener('click', e => {
           const id = btn.dataset.id;
-          showConfirm('حذف المدرب وجلساته؟', async () => {
+          showConfirm(t('confirmDeleteCoach'), async () => {
             coaches = coaches.filter(c => c.id !== id);
             coachBookings = coachBookings.filter(s => s.coachId !== id);
             await api.saveCoaches(coaches);
@@ -3536,11 +3676,11 @@
     
     // --- التبويب: الكوبونات ---
     else if (tab === 'promos') {
-      html = `<button class="btn btn-primary" id="addPromoBtn"><i class="fas fa-plus"></i> إضافة كوبون</button>
-        <table class="admin-table"><tr><th>الكود</th><th>الخصم</th><th>الاستخدامات</th><th>الصالحية</th><th>إجراءات</th></tr>`;
+      html = `<button class="btn btn-primary" id="addPromoBtn"><i class="fas fa-plus"></i> ${t('addPromo')}</button>
+        <table class="admin-table"><tr><th>${t('code')}</th><th>${t('discount')}</th><th>${t('usage')}</th><th>${t('validity')}</th><th>${t('actions')}</th></tr>`;
       promoCodes.forEach(p => {
         const discountText = p.discountType === 'percentage' ? `${p.discountValue}%` : `${p.discountValue} ${currencySymbol}`;
-        const validity = `${p.validFrom || 'الآن'} - ${p.validUntil || 'دائم'}`;
+        const validity = `${p.validFrom || t('now')} - ${p.validUntil || t('forever')}`;
         html += `<tr><td>${p.code}</td><td>${discountText}</td><td>${p.usedCount || 0} / ${p.maxUses || '∞'}</td>
           <td>${validity}</td>
           <td><button class="btn-outline btn-sm delete-promo-btn" data-code="${p.code}"><i class="fas fa-trash"></i></button></td></tr>`;
@@ -3549,15 +3689,15 @@
       content.innerHTML = html;
       
       document.getElementById('addPromoBtn').addEventListener('click', () => {
-        const code = prompt('أدخل كود الخصم (أحرف كبيرة):');
+        const code = prompt(t('enterPromoCode'));
         if (!code) return;
-        const type = prompt('نوع الخصم (percentage/value):', 'percentage');
+        const type = prompt(t('enterDiscountType'), 'percentage');
         if (!type) return;
-        const value = parseFloat(prompt('قيمة الخصم:', '10'));
+        const value = parseFloat(prompt(t('enterDiscountValue'), '10'));
         if (isNaN(value)) return;
-        const maxUses = parseInt(prompt('الحد الأقصى للاستخدام (اتركه فارغاً لغير محدود):', '')) || null;
-        const validFrom = prompt('تاريخ البداية (YYYY-MM-DD) أو اتركه فارغاً:', '');
-        const validUntil = prompt('تاريخ النهاية (YYYY-MM-DD) أو اتركه فارغاً:', '');
+        const maxUses = parseInt(prompt(t('enterMaxUses'), '')) || null;
+        const validFrom = prompt(t('enterValidFrom'), '');
+        const validUntil = prompt(t('enterValidUntil'), '');
         
         promoCodes.push({
           code: code.toUpperCase(),
@@ -3572,7 +3712,7 @@
         });
         api.savePromoCodes(promoCodes);
         loadAdminDashboard('promos');
-        showToast('تم إضافة الكوبون');
+        showToast(t('promoAdded'));
       });
       
       content.querySelectorAll('.delete-promo-btn').forEach(btn => {
@@ -3581,7 +3721,7 @@
           promoCodes = promoCodes.filter(p => p.code !== code);
           await api.savePromoCodes(promoCodes);
           loadAdminDashboard('promos');
-          showToast('تم حذف الكوبون');
+          showToast(t('promoDeleted'));
         });
       });
     }
@@ -3593,19 +3733,19 @@
       const totalRev = venueRev + coachRev;
       const totalFee = bookings.reduce((s, b) => s + (b.appFee || 0), 0) + coachBookings.reduce((s, b) => s + (b.appFee || 0), 0);
       
-      html = `<h3>إجمالي الإيرادات: ${totalRev.toFixed(2)} ${currencySymbol}</h3>
-        <h4>إيرادات الملاعب: ${venueRev.toFixed(2)} ${currencySymbol}</h4>
-        <h4>إيرادات المدربين: ${coachRev.toFixed(2)} ${currencySymbol}</h4>
-        <h4>إجمالي رسوم التطبيق: ${totalFee.toFixed(2)} ${currencySymbol}</h4>`;
+      html = `<h3>${t('totalRevenue')}: ${totalRev.toFixed(2)} ${currencySymbol}</h3>
+        <h4>${t('courtRevenue')}: ${venueRev.toFixed(2)} ${currencySymbol}</h4>
+        <h4>${t('coachRevenue')}: ${coachRev.toFixed(2)} ${currencySymbol}</h4>
+        <h4>${t('totalFees')}: ${totalFee.toFixed(2)} ${currencySymbol}</h4>`;
       content.innerHTML = html;
     }
     
     // --- التبويب: البيانات (استيراد/تصدير) ---
     else if (tab === 'data') {
       html = `<div style="display:flex;flex-direction:column;gap:16px;">
-        <button id="exportDataBtn" class="btn btn-primary"><i class="fas fa-download"></i> تصدير JSON</button>
-        <label class="btn btn-outline" style="width:auto;"><i class="fas fa-upload"></i> استيراد JSON<input type="file" id="importFileInput" accept=".json" style="display:none;"></label>
-        <button id="clearDataBtn" class="btn btn-danger">مسح البيانات (عدا الأدمن)</button>
+        <button id="exportDataBtn" class="btn btn-primary"><i class="fas fa-download"></i> ${t('exportJSON')}</button>
+        <label class="btn btn-outline" style="width:auto;"><i class="fas fa-upload"></i> ${t('importJSON')}<input type="file" id="importFileInput" accept=".json" style="display:none;"></label>
+        <button id="clearDataBtn" class="btn btn-danger">${t('clearData')}</button>
       </div>`;
       content.innerHTML = html;
       
@@ -3624,8 +3764,8 @@
         try {
           const text = await file.text();
           const imported = JSON.parse(text);
-          if (!imported.venues || !imported.bookings || !imported.users) throw new Error('بنية غير صالحة');
-          showConfirm('استبدال جميع البيانات؟', async () => {
+          if (!imported.venues || !imported.bookings || !imported.users) throw new Error(t('invalidStructure'));
+          showConfirm(t('confirmReplaceData'), async () => {
             venues = imported.venues; bookings = imported.bookings; users = imported.users;
             customSports = imported.customSports || [];
             reviews = imported.reviews || {}; blackouts = imported.blackouts || {}; courts = imported.courts || [];
@@ -3635,7 +3775,7 @@
             recurringGroups = imported.recurringGroups || [];
             
             if (!users.some(u => u.role === 'admin')) {
-              users.push({ id: 'admin', email: 'admin@sport.com', password: 'admin', role: 'admin', name: 'المدير', blocked: false });
+              users.push({ id: 'admin', email: 'admin@sport.com', password: 'admin', role: 'admin', name: t('admin'), blocked: false });
             }
             
             await api.saveVenues(venues); await api.saveBookings(bookings); await api.saveUsers(users);
@@ -3645,19 +3785,19 @@
             await api.savePromoCodes(promoCodes); await api.saveFavorites(favorites); await api.saveRecurringGroups(recurringGroups);
             
             populateSportSelects();
-            showToast('تم الاستيراد بنجاح');
+            showToast(t('importSuccess'));
             loadAdminDashboard('data');
             if (currentViewMode === 'courts') renderCourts(); else renderCoaches();
           });
         } catch (err) {
-          showToast('خطأ: ' + err.message, false);
+          showToast(t('error') + ': ' + err.message, false);
         }
         e.target.value = '';
       });
       
       document.getElementById('clearDataBtn').addEventListener('click', () => {
-        showConfirm('مسح جميع البيانات (ما عدا الأدمن)؟', async () => {
-          const admin = users.find(u => u.id === currentUser.id && u.role === 'admin') || { id: 'admin', email: 'admin@sport.com', password: 'admin', role: 'admin', name: 'المدير' };
+        showConfirm(t('confirmClearData'), async () => {
+          const admin = users.find(u => u.id === currentUser.id && u.role === 'admin') || { id: 'admin', email: 'admin@sport.com', password: 'admin', role: 'admin', name: t('admin') };
           venues = []; bookings = []; users = [admin]; customSports = []; reviews = {}; blackouts = {}; courts = [];
           coaches = []; coachBookings = []; coachAvailability = {}; coachReviews = {};
           promoCodes = []; favorites = []; recurringGroups = [];
@@ -3669,7 +3809,7 @@
           await api.savePromoCodes(promoCodes); await api.saveFavorites(favorites); await api.saveRecurringGroups(recurringGroups);
           
           populateSportSelects();
-          showToast('تم مسح البيانات');
+          showToast(t('dataCleared'));
           loadAdminDashboard('data');
           if (currentViewMode === 'courts') renderCourts(); else renderCoaches();
         });
@@ -3691,17 +3831,17 @@
       const coachRatings = Object.values(coachReviews).flat();
       const avgCoachRating = coachRatings.length > 0 ? (coachRatings.reduce((s, r) => s + r.rating, 0) / coachRatings.length).toFixed(1) : '-';
       
-      html = `<h4>إحصائيات متقدمة</h4>
-        <p>عدد المستخدمين: ${totalUsers}</p>
-        <p>عدد المنشآت: ${totalVenues}</p>
-        <p>عدد الملاعب: ${totalCourts}</p>
-        <p>عدد المدربين: ${totalCoaches}</p>
-        <p>عدد حجوزات الملاعب: ${totalCourtBookings}</p>
-        <p>عدد جلسات التدريب: ${totalCoachSessions}</p>
-        <p>متوسط تقييم المنشآت: ${avgVenueRating}</p>
-        <p>متوسط تقييم المدربين: ${avgCoachRating}</p>
-        <p>عدد الكوبونات: ${promoCodes.length}</p>
-        <p>عدد عناصر المفضلة: ${favorites.length}</p>`;
+      html = `<h4>${t('advancedStats')}</h4>
+        <p>${t('totalUsers')}: ${totalUsers}</p>
+        <p>${t('totalVenues')}: ${totalVenues}</p>
+        <p>${t('totalCourts')}: ${totalCourts}</p>
+        <p>${t('totalCoaches')}: ${totalCoaches}</p>
+        <p>${t('totalCourtBookings')}: ${totalCourtBookings}</p>
+        <p>${t('totalCoachSessions')}: ${totalCoachSessions}</p>
+        <p>${t('avgVenueRating')}: ${avgVenueRating}</p>
+        <p>${t('avgCoachRating')}: ${avgCoachRating}</p>
+        <p>${t('totalPromos')}: ${promoCodes.length}</p>
+        <p>${t('totalFavorites')}: ${favorites.length}</p>`;
       content.innerHTML = html;
     }
   }
@@ -3716,26 +3856,7 @@
   document.getElementById('adminTabData')?.addEventListener('click', () => loadAdminDashboard('data'));
   document.getElementById('adminTabAdvanced')?.addEventListener('click', () => loadAdminDashboard('advanced'));
 
-  // ---------- دوال i18n متكاملة ----------
-  function initI18n() {
-    const userLang = navigator.language.startsWith('ar') ? 'ar' : 'en';
-    setLanguage(userLang);
-       
-    // إضافة زر تغيير اللغة
-    const langBtn = document.createElement('button');
-    langBtn.className = 'btn-sm';
-    langBtn.id = 'toggleLangBtn';
-    langBtn.innerHTML = '<i class="fas fa-language"></i> English';
-    langBtn.style.marginLeft = '8px';
-    document.querySelector('.user-area')?.prepend(langBtn);
-    
-    document.getElementById('toggleLangBtn').addEventListener('click', () => {
-      setLanguage(currentLanguage === 'ar' ? 'en' : 'ar');
-      document.getElementById('toggleLangBtn').innerHTML = currentLanguage === 'ar' ? '<i class="fas fa-language"></i> English' : '<i class="fas fa-language"></i> العربية';
-    });
-  }
-
-// ---------- إضافة رياضة مخصصة ----------
+  // ---------- إضافة رياضة مخصصة ----------
   document.getElementById('addSportBtn')?.addEventListener('click', async () => {
     const input = document.getElementById('newSportInput');
     if (await addCustomSport(input.value)) input.value = '';
@@ -3782,11 +3903,221 @@
     openNotifications();
     updateNotificationBadge();
   });
+  
+    // ---------- دوال i18n إضافية للقاموس (توسيع القاموس) ----------
+  // تحديث قاموس i18n بالمفاتيح المفقودة
+  Object.assign(i18n.ar, {
+    name: 'الاسم',
+    email: 'البريد الإلكتروني',
+    phone: 'رقم الهاتف',
+    role: 'الدور',
+    status: 'الحالة',
+    actions: 'إجراءات',
+    owner: 'المالك',
+    rating: 'التقييم',
+    addVenue: 'إضافة منشأة',
+    addCoach: 'إضافة مدرب',
+    addPromo: 'إضافة كوبون',
+    code: 'الكود',
+    discount: 'الخصم',
+    usage: 'الاستخدام',
+    validity: 'الصالحية',
+    now: 'الآن',
+    forever: 'دائم',
+    enterPromoCode: 'أدخل كود الخصم (أحرف كبيرة):',
+    enterDiscountType: 'نوع الخصم (percentage/value):',
+    enterDiscountValue: 'قيمة الخصم:',
+    enterMaxUses: 'الحد الأقصى للاستخدام (اتركه فارغاً لغير محدود):',
+    enterValidFrom: 'تاريخ البداية (YYYY-MM-DD) أو اتركه فارغاً:',
+    enterValidUntil: 'تاريخ النهاية (YYYY-MM-DD) أو اتركه فارغاً:',
+    promoAdded: 'تم إضافة الكوبون',
+    promoDeleted: 'تم حذف الكوبون',
+    courtBookings: 'حجوزات الملاعب',
+    coachSessions: 'جلسات التدريب',
+    amount: 'المبلغ',
+    courtRevenue: 'إيرادات الملاعب',
+    coachRevenue: 'إيرادات المدربين',
+    totalFees: 'إجمالي رسوم التطبيق',
+    exportJSON: 'تصدير JSON',
+    importJSON: 'استيراد JSON',
+    clearData: 'مسح البيانات (عدا الأدمن)',
+    invalidStructure: 'بنية غير صالحة',
+    confirmReplaceData: 'استبدال جميع البيانات؟',
+    importSuccess: 'تم الاستيراد بنجاح',
+    error: 'خطأ',
+    confirmClearData: 'مسح جميع البيانات (ما عدا الأدمن)؟',
+    dataCleared: 'تم مسح البيانات',
+    advancedStats: 'إحصائيات متقدمة',
+    totalUsers: 'عدد المستخدمين',
+    totalVenues: 'عدد المنشآت',
+    totalCourts: 'عدد الملاعب',
+    totalCoaches: 'عدد المدربين',
+    totalCourtBookings: 'عدد حجوزات الملاعب',
+    totalCoachSessions: 'عدد جلسات التدريب',
+    avgVenueRating: 'متوسط تقييم المنشآت',
+    avgCoachRating: 'متوسط تقييم المدربين',
+    totalPromos: 'عدد الكوبونات',
+    totalFavorites: 'عدد عناصر المفضلة',
+    blocked: 'محظور',
+    active: 'نشط',
+    unblock: 'إلغاء الحظر',
+    block: 'حظر',
+    unknown: 'غير معروف',
+    confirmDeleteVenue: 'حذف المنشأة وحجوزاتها؟',
+    confirmDeleteUser: 'حذف المستخدم؟',
+    confirmDeleteCoach: 'حذف المدرب وجلساته؟',
+    userBlocked: 'تم حظر المستخدم',
+    userUnblocked: 'تم إلغاء الحظر',
+    saveChanges: 'حفظ التغييرات',
+    changePassword: 'تغيير كلمة المرور',
+    currentPassword: 'كلمة المرور الحالية',
+    newPassword: 'كلمة المرور الجديدة',
+    confirmPassword: 'تأكيد كلمة المرور الجديدة',
+    profileImageUpdated: 'تم تحديث الصورة الشخصية',
+    profileUpdated: 'تم تحديث الملف الشخصي',
+    emailAlreadyUsed: 'البريد الإلكتروني مستخدم مسبقاً',
+    incorrectPassword: 'كلمة المرور الحالية غير صحيحة',
+    passwordsMismatch: 'كلمة المرور الجديدة غير متطابقة',
+    passwordTooShort: 'كلمة المرور يجب أن تكون 4 أحرف على الأقل',
+    passwordChanged: 'تم تغيير كلمة المرور بنجاح',
+    loginRequired: 'يجب تسجيل الدخول',
+    noFavorites: 'لا توجد عناصر في المفضلة',
+    from: 'من',
+    hour: 'ساعة',
+    viewCourts: 'عرض الملاعب',
+    bookSession: 'احجز جلسة',
+    unauthorized: 'غير مصرح',
+    allVenuesAndCoaches: 'جميع المنشآت والمدربين',
+    totalRevenue: 'إجمالي الإيرادات',
+    bookingCount: 'عدد الحجوزات',
+    averageBookingValue: 'متوسط قيمة الحجز',
+    monthlyRevenue: 'الإيرادات الشهرية',
+    popularSports: 'الرياضات الأكثر طلباً',
+    peakHours: 'الأوقات الأكثر ازدحاماً',
+    exportExcel: 'تصدير Excel',
+    exportPDF: 'تصدير PDF',
+    revenue: 'الإيرادات',
+    bookings: 'الحجوزات',
+    type: 'النوع',
+    customer: 'العميل',
+    price: 'السعر',
+    court: 'ملعب',
+    coach: 'مدرب',
+    bookingsReport: 'تقرير_الحجوزات',
+    analyticsReport: 'تقرير التحليلات',
+    report: 'تقرير'
+  });
 
-  // ---------- التهيئة ----------
+  Object.assign(i18n.en, {
+    name: 'Name',
+    email: 'Email',
+    phone: 'Phone',
+    role: 'Role',
+    status: 'Status',
+    actions: 'Actions',
+    owner: 'Owner',
+    rating: 'Rating',
+    addVenue: 'Add Venue',
+    addCoach: 'Add Coach',
+    addPromo: 'Add Promo',
+    code: 'Code',
+    discount: 'Discount',
+    usage: 'Usage',
+    validity: 'Validity',
+    now: 'Now',
+    forever: 'Forever',
+    enterPromoCode: 'Enter promo code (uppercase):',
+    enterDiscountType: 'Discount type (percentage/value):',
+    enterDiscountValue: 'Discount value:',
+    enterMaxUses: 'Max uses (leave empty for unlimited):',
+    enterValidFrom: 'Valid from (YYYY-MM-DD) or leave empty:',
+    enterValidUntil: 'Valid until (YYYY-MM-DD) or leave empty:',
+    promoAdded: 'Promo code added',
+    promoDeleted: 'Promo code deleted',
+    courtBookings: 'Court Bookings',
+    coachSessions: 'Coach Sessions',
+    amount: 'Amount',
+    courtRevenue: 'Court Revenue',
+    coachRevenue: 'Coach Revenue',
+    totalFees: 'Total App Fees',
+    exportJSON: 'Export JSON',
+    importJSON: 'Import JSON',
+    clearData: 'Clear Data (except admin)',
+    invalidStructure: 'Invalid structure',
+    confirmReplaceData: 'Replace all data?',
+    importSuccess: 'Import successful',
+    error: 'Error',
+    confirmClearData: 'Clear all data (except admin)?',
+    dataCleared: 'Data cleared',
+    advancedStats: 'Advanced Statistics',
+    totalUsers: 'Total Users',
+    totalVenues: 'Total Venues',
+    totalCourts: 'Total Courts',
+    totalCoaches: 'Total Coaches',
+    totalCourtBookings: 'Total Court Bookings',
+    totalCoachSessions: 'Total Coach Sessions',
+    avgVenueRating: 'Avg Venue Rating',
+    avgCoachRating: 'Avg Coach Rating',
+    totalPromos: 'Total Promos',
+    totalFavorites: 'Total Favorites',
+    blocked: 'Blocked',
+    active: 'Active',
+    unblock: 'Unblock',
+    block: 'Block',
+    unknown: 'Unknown',
+    confirmDeleteVenue: 'Delete venue and its bookings?',
+    confirmDeleteUser: 'Delete user?',
+    confirmDeleteCoach: 'Delete coach and sessions?',
+    userBlocked: 'User blocked',
+    userUnblocked: 'User unblocked',
+    saveChanges: 'Save Changes',
+    changePassword: 'Change Password',
+    currentPassword: 'Current Password',
+    newPassword: 'New Password',
+    confirmPassword: 'Confirm New Password',
+    profileImageUpdated: 'Profile image updated',
+    profileUpdated: 'Profile updated',
+    emailAlreadyUsed: 'Email already in use',
+    incorrectPassword: 'Incorrect current password',
+    passwordsMismatch: 'New passwords do not match',
+    passwordTooShort: 'Password must be at least 4 characters',
+    passwordChanged: 'Password changed successfully',
+    loginRequired: 'Login required',
+    noFavorites: 'No favorites yet',
+    from: 'From',
+    hour: 'hour',
+    viewCourts: 'View Courts',
+    bookSession: 'Book Session',
+    unauthorized: 'Unauthorized',
+    allVenuesAndCoaches: 'All Venues and Coaches',
+    totalRevenue: 'Total Revenue',
+    bookingCount: 'Booking Count',
+    averageBookingValue: 'Average Booking Value',
+    monthlyRevenue: 'Monthly Revenue',
+    popularSports: 'Popular Sports',
+    peakHours: 'Peak Hours',
+    exportExcel: 'Export Excel',
+    exportPDF: 'Export PDF',
+    revenue: 'Revenue',
+    bookings: 'Bookings',
+    type: 'Type',
+    customer: 'Customer',
+    price: 'Price',
+    court: 'Court',
+    coach: 'Coach',
+    bookingsReport: 'bookings_report',
+    analyticsReport: 'Analytics Report',
+    report: 'report'
+  });
+
+  // تحديث واجهة المستخدم بعد إضافة المفاتيح الجديدة
+  if (currentLanguage) {
+    updateUITranslations();
+  }
+
+  // ---------- التهيئة النهائية ----------
   (async function init() {
     showLoader();
-    await initializeCurrency();
     
     // تحميل المكتبات الخارجية
     if (typeof XLSX === 'undefined') {
@@ -3801,7 +4132,6 @@
     }
     
     await initializeCurrency();
-    initI18n();
     
     // تحميل البيانات الافتراضية إذا لم تكن موجودة
     let v = await api.getVenues();
