@@ -100,12 +100,7 @@ input:focus, select:focus, textarea:focus { border-color:#38bdf8; outline:none; 
 .cart-item button { background:none; border:none; color:#ef4444; cursor:pointer; font-size:1.2rem; }
 #cartTotal { font-weight:700; color:#38bdf8; }
 
-/* ----- أنماط جديدة خاصة بالمدربين وأزرار التبديل (تمت إضافتها مع الحفاظ على كل ما سبق) ----- */
-/* أزرار التبديل بين عرض الملاعب والمدربين */
-.toggle-view-btn { padding: 10px 20px; border-radius: 40px; font-weight: 600; transition: all 0.2s; }
-.toggle-view-btn.active { background: #0f172a; color: white; border-color: #0f172a; }
-
-/* بطاقات المدربين - تشبه بطاقات الملاعب مع اختلافات طفيفة */
+/* ----- أنماط إضافية للميزات الجديدة (بدون تكرار) ----- */
 .coach-card { background:white; border-radius:20px; overflow:hidden; box-shadow:0 8px 18px rgba(0,0,0,0.05); border:1px solid #f1f5f9; transition: transform 0.2s; }
 .coach-card:hover { transform: translateY(-4px); }
 .coach-img { height:160px; background-size:cover; background-position:center; position:relative; }
@@ -119,107 +114,29 @@ input:focus, select:focus, textarea:focus { border-color:#38bdf8; outline:none; 
 .coach-distance { color:#0f172a; font-weight:600; margin:8px 0; }
 .coach-pricing { margin:8px 0; font-size:0.9rem; color:#475569; }
 
-/* تعديل بسيط للاستجابة */
-@media (max-width:640px) { 
-  .header-content { flex-direction:column; gap:12px; } 
-  .venues-grid { grid-template-columns:1fr; } 
-}
+.toggle-view-btn { padding: 10px 20px; border-radius: 40px; font-weight: 600; transition: all 0.2s; }
+.toggle-view-btn.active { background: #0f172a; color: white; border-color: #0f172a; }
 
-/* ----- أنماط إضافية للميزات الجديدة ----- */
+.favorite-btn { position: absolute; top: 12px; left: 12px; background: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; }
 
-/* بطاقات المدربين */
-.coach-card {
-  background: white;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 8px 18px rgba(0,0,0,0.05);
-  border: 1px solid #f1f5f9;
-  transition: transform 0.2s;
-}
-.coach-card:hover { transform: translateY(-4px); }
-.coach-img {
-  height: 160px;
-  background-size: cover;
-  background-position: center;
-  position: relative;
-}
-.coach-type {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: #0f172a;
-  color: white;
-  padding: 4px 12px;
-  border-radius: 30px;
-}
-.coach-info { padding: 16px; }
-.coach-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 8px;
-}
-.coach-name { font-size: 1.3rem; font-weight: 700; }
-.coach-sport {
-  background: #e2e8f0;
-  padding: 4px 12px;
-  border-radius: 30px;
-  font-size: 0.9rem;
-}
-.coach-rating { color: #fbbf24; margin: 4px 0; }
-.coach-desc { color: #64748b; margin: 8px 0; }
-.coach-distance { color: #0f172a; font-weight: 600; margin: 8px 0; }
-.coach-pricing { margin: 8px 0; font-size: 0.9rem; color: #475569; }
+#revenueChart, #sportChart, #hourChart { width: 100% !important; height: auto !important; }
 
-/* أزرار التبديل (الملاعب / المدربين) */
-.toggle-view-btn {
-  padding: 10px 20px;
-  border-radius: 40px;
-  font-weight: 600;
-  transition: all 0.2s;
-}
-.toggle-view-btn.active {
-  background: #0f172a;
-  color: white;
-  border-color: #0f172a;
-}
-
-/* زر المفضلة */
-.favorite-btn {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  background: white;
-  border: none;
-  border-radius: 50%;
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* تنسيقات الرسوم البيانية */
-#revenueChart, #sportChart, #hourChart {
-  width: 100% !important;
-  height: auto !important;
-}
-
-/* شارات الحالة */
-.status-badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 600;
-}
+.status-badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 0.8rem; font-weight: 600; }
 .status-pending { background: #fbbf24; color: #000; }
 .status-confirmed { background: #10b981; color: #fff; }
 .status-cancelled { background: #ef4444; color: #fff; }
 
-/* تحسينات للموبايل */
+/* دعم RTL/LTR */
+[dir="rtl"] .modal-card { text-align: right; }
+[dir="ltr"] .modal-card { text-align: left; }
+[dir="rtl"] .btn i { margin-left: 6px; margin-right: 0; }
+[dir="ltr"] .btn i { margin-right: 6px; margin-left: 0; }
+[dir="ltr"] .admin-table th,
+[dir="ltr"] .admin-table td { text-align: left; }
+
+#toggleLangBtn { margin: 0 8px; }
+
+/* تحسينات للموبايل (دمج القاعدتين) */
 @media (max-width: 640px) {
   .header-content { flex-direction: column; gap: 12px; }
   .venues-grid { grid-template-columns: 1fr; }
